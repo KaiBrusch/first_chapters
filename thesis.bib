@@ -1,0 +1,148 @@
+@article {bigdataGAM,
+    author = {Wood, Simon N. and Goude, Yannig and Shaw, Simon},
+    title = {Generalized additive models for large data sets},
+    journal = {Journal of the Royal Statistical Society: Series C (Applied Statistics)},
+    volume = {64},
+    number = {1},
+    issn = {1467-9876},
+    url = {http://dx.doi.org/10.1111/rssc.12068},
+    doi = {10.1111/rssc.12068},
+    pages = {139--155},
+    keywords = {Correlated additive model, Electricity load prediction, Generalized additive model estimation},
+    year = {2015},
+    abstract = {We consider an application in electricity grid load prediction, where generalized additive models are appropriate, but where the data set's size can make their use practically intractable with existing methods. We therefore develop practical generalized additive model fitting methods for large data sets in the case in which the smooth terms in the model are represented by using penalized regression splines. The methods use iterative update schemes to obtain factors of the model matrix while requiring only subblocks of the model matrix to be computed at any one time. We show that efficient smoothing parameter estimation can be carried out in a well-justified manner. The grid load prediction problem requires updates of the model fit, as new data become available, and some means for dealing with residual auto-correlation in grid load. Methods are provided for these problems and parallel implementation is covered. The methods allow estimation of generalized additive models for large data sets by using modest computer hardware, and the grid load prediction problem illustrates the utility of reduced rank spline smoothing methods for dealing with complex modelling problems.},
+}
+
+ @Book{gamBook,
+    title = {Generalized Additive Models: An Introduction with R},
+    year = {2006},
+    author = {S.N Wood},
+    publisher = {Chapman and Hall/CRC},
+  }
+
+
+@article{stablesmooth,
+    title = {Stable and efficient multiple smoothing parameter
+    estimation for generalized additive models},
+    journal = {Journal of the American Statistical Association},
+    volume = {99},
+    number = {467},
+    pages = {673-686},
+    year = {2004},
+    author = {S. N. Wood},
+}
+
+@inproceedings{spark,
+ author = {Zaharia, Matei and Chowdhury, Mosharaf and Franklin, Michael J. and Shenker, Scott and Stoica, Ion},
+ title = {Spark: Cluster Computing with Working Sets},
+ booktitle = {Proceedings of the 2Nd USENIX Conference on Hot Topics in Cloud Computing},
+ series = {HotCloud'10},
+ year = {2010},
+ location = {Boston, MA},
+ pages = {10--10},
+ numpages = {1},
+ url = {http://dl.acm.org/citation.cfm?id=1863103.1863113},
+ acmid = {1863113},
+ publisher = {USENIX Association},
+ address = {Berkeley, CA, USA},
+}
+
+@misc{Breeze,
+  author = {David Hall},
+  title = {Breeze},
+  year = 2009,
+  url = "\url{https://github.com/scalanlp/breeze}",
+}
+
+@book{strang09,
+  abstract = {Book Description: Gilbert Strang's textbooks have changed the entire approach to learning linear algebra -- away from abstract vector spaces to specific examples of the four fundamental subspaces: the column space and nullspace of A and A'. Introduction to Linear Algebra, Fourth Edition includes challenge problems to complement the review problems that have been highly praised in previous editions. The basic course is followed by seven applications: differential equations, engineering, graph theory, statistics, Fourier methods and the FFT, linear programming, and computer graphics. Thousands of teachers in colleges and universities and now high schools are using this book, which truly explains this crucial subject.},
+  added-at = {2013-09-21T15:11:44.000+0200},
+  address = {Wellesley, MA},
+  author = {Strang, Gilbert},
+  biburl = {http://www.bibsonomy.org/bibtex/210d11fafe587fca8e67791a6f71a939d/ytyoun},
+  interhash = {f99a54beabc2455c5c0994a2353e59f0},
+  intrahash = {10d11fafe587fca8e67791a6f71a939d},
+  isbn = {0030105676},
+  keywords = {eigenvalues linear.algebra matrix textbook},
+  publisher = {Wellesley-Cambridge Press},
+  timestamp = {2015-07-29T07:05:49.000+0200},
+  title = {Linear Algebra and Its Applications},
+  year = 2009
+}
+
+@article{Nelder,
+ ISSN = {00359238},
+ URL = {http://www.jstor.org/stable/2344614},
+ abstract = {The technique of iterative weighted linear regression can be used to obtain maximum likelihood estimates of the parameters with observations distributed according to some exponential family and systematic effects that can be made linear by a suitable transformation. A generalization of the analysis of variance is given for these models using log-likelihoods. These generalized linear models are illustrated by examples relating to four distributions; the Normal, Binomial (probit analysis, etc.), Poisson (contingency tables) and gamma (variance components). The implications of the approach in designing statistics courses are discussed.},
+ author = {J. A. Nelder, R. W. M. Wedderburn},
+ journal = {Journal of the Royal Statistical Society. Series A (General)},
+ number = {3},
+ pages = {370-384},
+ publisher = {Wiley},
+ title = {Generalized Linear Models},
+ volume = {135},
+ year = {1972}
+}
+
+@book{GLM,
+           title = {An Introduction to Generalized Linear Models, Third Edition},
+          author = {Annette J. Dobson and Adrian G. Barnett},
+         address = {Boca Raton, FL},
+       publisher = {Chapman \& Hall/CRC Press},
+            year = {2008},
+          series = {Texts in Statistical Science},
+            note = {For more information about this book please refer to the publisher's website (see link) or contact the author.},
+             url = {http://eprints.qut.edu.au/15448/},
+        abstract = {- Introduces GLMs in a way that enables readers to understand the unifying structure that underpins them.
+- Discusses common concepts and principles of advanced GLMs, including nominal and ordinal regression, survival analysis, and longitudinal analysis.
+- Connects Bayesian analysis and MCMC methods to fit GLMs.
+- Contains numerous examples from business, medicine, engineering, and the social sciences.
+- Provides the example code for R, Stata, and WinBUGS to encourage implementation of the methods.
+- Offers the data sets and solutions to the exercises online.
+
+Continuing to emphasize numerical and graphical methods, An Introduction to Generalized Linear Models, Third Edition provides a cohesive framework for statistical modeling. This new edition of a bestseller has been updated with Stata, R, and WinBUGS code as well as three new chapters on Bayesian analysis.
+Like its predecessor, this edition presents the theoretical background of generalized linear models (GLMs) before focusing on methods for analyzing particular kinds of data. It covers normal, Poisson, and binomial distributions; linear regression models; classical estimation and model fitting methods; and frequentist methods of statistical inference. After forming this foundation, the authors explore multiple linear regression, analysis of variance (ANOVA), logistic regression, log-linear models, survival analysis, multilevel modeling, Bayesian models, and Markov chain Monte Carlo (MCMC) methods.
+
+Using popular statistical software programs, this concise and accessible text illustrates practical approaches to estimation, model fitting, and model comparisons. It includes examples and exercises with complete data sets for nearly all the models covered.}
+}
+
+@book{hastie,
+  added-at = {2008-05-16T16:17:42.000+0200},
+  address = {New York, NY, USA},
+  author = {Hastie, Trevor and Tibshirani, Robert and Friedman, Jerome},
+  biburl = {http://www.bibsonomy.org/bibtex/2f58afc5c9793fcc8ad8389824e57984c/sb3000},
+  interhash = {d585aea274f2b9b228fc1629bc273644},
+  intrahash = {f58afc5c9793fcc8ad8389824e57984c},
+  keywords = {ml statistics},
+  publisher = {Springer New York Inc.},
+  series = {Springer Series in Statistics},
+  timestamp = {2008-05-16T16:17:43.000+0200},
+  title = {The Elements of Statistical Learning},
+  year = 2001
+}
+
+
+@misc{r,
+  title = {{What is R?} R},
+  howpublished = {\url{https://www.r-project.org/about.html}},
+  note = {Accessed: 2015-03-28}
+}
+
+
+@Book{gam,
+ author = {Hastie, Trevor},
+ title = {Generalized additive models},
+ publisher = {Chapman and Hall},
+ year = {1990},
+ address = {London New York},
+ isbn = {0412343908}
+ }
+
+@misc{gamsilver,
+    author = "{KIM LARSEN}",
+    publisher = "MultiThreaded",
+    title = "GAM: The Predictive Modeling Silver Bullet",
+    month = "Juli",
+    year = "2015",
+    url = "http://multithreaded.stitchfix.com/assets/files/gam.pdf",}]
+
