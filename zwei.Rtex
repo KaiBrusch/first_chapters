@@ -6,7 +6,7 @@
 \newcommand{\note}[1]{{\tiny (#1)}}
 
 % Packages explained - Adding more functions to LATEX http://www.latex-tutorial.com/tutorials/beginners/lesson-3/
-\usepackage[utf8]{inputenc}
+
 \usepackage{booktabs}
 \usepackage{url}
 \usepackage{hyperref}
@@ -16,7 +16,6 @@
 \usepackage{listings}
 \usepackage{graphicx}
 \usepackage[utf8]{inputenc}
-\usepackage[english]{babel}
 \usepackage[margin=1.3in]{geometry}
 
 % fügt die Literatur auch zum Inhaltsverzeichnis hinzu (ist so nicht default)
@@ -73,7 +72,7 @@
         \begin{figure}
             \centering
             \includegraphics[width=\textwidth]{sales}
-            \caption{We illustrate the units sold as a function of spend on each of the advertisement channels. The blue line is a linear model describing the underlying relationship between units sold and spend on media outlet.}
+            \caption{\cite{hastie} illustrates the units sold as a function of spend on each of the advertisement channels. The blue line is a linear model describing the underlying relationship between units sold and spend on media outlet.}
             \label{fig:sales}
         \end{figure}
         
@@ -134,31 +133,149 @@
     
     \subsection{Statistical Computing Environment: R}
         
-    R is a free software environment for statistical computing and graphics. R is designed to express statistical models and comes with an development environment that is build to illustrate and discover data. Academia has recognized R as it's language and continuously published learning material and research alongside R code. \cite{hastie} and \cite{gamBook} employ R to illustrate statistical concepts in a computational environment. I will do the same and use R to express statistical concepts and example throughout this thesis. I will now introduce how to perform the relevant matrix operations in R:
+    R is a free software environment for statistical computing and graphics. R is designed to express statistical models and comes with an development environment that is build to illustrate and discover data. Academia has recognized R as it's language and continuously published learning material and research alongside R code. \cite{hastie} and \cite{gamBook} employ R to illustrate statistical concepts in a computational environment. I will do the same and use R to express statistical concepts and example throughout this thesis. I will now introduce some syntax for matrix manipulation in R:
     
   <<chunk1>>=
-# Create a sequence of numbers
-X = 2:10
+    # A vector is the essential data type in R, R uses row vectors
+    vector = c(1,2,3,4)
+    
+    # Indexes start at 1
+    vector[1]
+    
+    # Create a matrix with n rows m columns filled with random values
+    n = 5
+    m = 3
+    X = matrix(runif(15),n,m)
 
-# Display basic statistical measures
-summary(X)
-
-@
+    # Display the generated matrix
+    X
+    # Transpose the matrix
+    t(X)
+    
+    # Multiply a matrix with its transpose
+    X %*% t(X)
+    
+    # Basic Indexing
+    X[1,2]
+    
+    # Extract subset of a matrix
+    X[1:3]
+    
+    # Assign values to subset of a matrix
+    X[1:3] = 2
+    X
+    
+    # Extract column of a matrix, implicit conversion to a row vector
+    X[,2]
+    
+    # Assign values to a column of a matrix
+    X[,2] = 5
+    X
+    
+    # Add a column to a matrix
+    cbind(X,c(1,2,3,4,5))
+    
+    # Add a row to a matrix
+    rbind(X,c(1,2,3))
+    @
         
     
     
-    \section{Generalized Linear Models}
-       Linear and generalized linear models are the backbone of statistics. 
+    \section{Linear Models}
+       I will introduce the linear and generalized linear model in this section. The linear model is the most basic member of statistical models and enforces a strict parametric form on the estimated function. Though linear models have limited real world applications they introduce many relevant ideas and concept for the following methods. The generalized linear model is the generalized version of the linear model and relaxes some restrictions set by the linear model. Both models are essential for understanding the generalized additive model which is the main subject of this thesis, the generalized linear model being the actual basis for a generalized additive model. For both models I will first introduce the relevant theory for the estimated function then explain how this function is estimated and conclude with an model example. 
         
+        \subsection{Simple Linear Model}
+        
+        The linear model, also linear regression, is a simple but interesting estimation method central to many other more sophisticated methods. We will start with the simple linear model. A simple linear model only allows the response variable to be explained in terms of one explanatory variable. \cite{gamBook} describes the theory for a linear model with one explanatory variables as following: Given $n$ observations of $x_i$ and $y_i$ where $y_i$ is the observations of a random variable $Y_i$ with expectation $\mu_i \equal E(Y_i)$. A linear model assumes a model of the following form:
+        
+        \begin{equation}
+            Y_i = \mu + \epsilon_i where \mu_i = x_i \beta
+        \end{equation}
+      
+        With $\beta$ being an unknown parameter that is to be estimated. The $\epsilon_i$ is the error term for that row. A linear model assumes that $\epsilon_i$ are mutually independent zero mean random variables with the same variance $\sigma^2$. The linear model explains the response variable Y in terms of a predictor variable $x$  multiplied by an estimated coefficient $\beta$ plus a random error term $\epsilon$. 
+        
+        \begin{figure}
+            \centering
+            \includegraphics[width=\textwidth]{simple_linear_model}
+            \caption{\cite{gamBook} visually described all relevant variables and their relationship}
+            \label{fig:simple_linear_model}
+        \end{figure}
+        
+        
+        The essential question that arises is: How can $\beta$ be estimated from the given data $x_i$,$y_i$. To find $beta$ for our desired function we need to define a measure explains of well a model with a particular $\beta$ fits the data. The canonical choice for linear models is the residual sum of squares:
+        \begin{equation} 
+        \mathbf{S} =  \sum_{i=1}^{n}(y\textsubscript{i} - x\textsubscript{i}\beta)^{2} = \sum_{i=1}^{n}(y\textsubscript{i} - \mu\textsubscript{i})^{2} 
+        \end{equation}
+        We define a good choice of $\beta$ to minimizes the difference between $y_i$ and $\mu_i$.  A well estimated $\beta$ results on a $S$ closer to zero and the problem of least square estimation becomes minimizing S with respect to $\beta$. To minimize S, differentiate with respect to (w.r.t.) $\beta$.
+        
+        \begin{equation} \label{partialDer} \frac{\partial S}{\partial \beta} = - \sum_{i=1}^{n} 2x_i(y_i-x_i\beta) \end{equation}
+
+       Setting the result to $0$ we can find the best estimate for $\beta$ called $\widehat{\beta}$, the hat denotes that this is an approximation of a true unknown value $\beta$. Rewriting the partial derivative to yield $\widehat{\beta}$ gives a very good idea of $\beta$.
+
+        \begin{equation}  - \sum_{i=1}^{n} 2x_i(y_i-x_i\widehat{\beta}) = 0  \end{equation}
+
+        \begin{equation} - \sum_{i=1}^{n} x_i y_i-\widehat{\beta} \sum_{i=1}^{n} x_i^2 = 0  \end{equation}
+
+        \begin{equation} \widehat{\beta} = \sum_{i=1}^{n} x_i y_i /\sum_{i=1}^{n} x_i^2 \end{equation}
+
+
+        Minimizing S w.r.t. $\beta$ to compute $\widehat{\beta}$ is a reasonable approach when dealing with one explanatory variable. The Gauss-Markov theorem shows that estimating $\beta$ with $\widehat{\beta}$ is best linear unbiased estimator. However, most relevant linear models involve more explanatory variables than one. The question for finding must be account for multiple explanatory variables but the measure of fit $S$ remains.
+      
         \subsection{Linear Model}
-        \cite{gamBook} describes linear models as statistical models in which an univariate response is modeled as the sum of a linear predictor plus a zero mean random error term. The linear predictor depends on some predictor variables $y$, measured with the response variable $x$ and some unknown parameters $\beta$ plus an error term $\epsilon$. This process is formally stated for a given row  $i$ of data as:
+        \subsubsection{Linear Model in the vector-matrix form}
+        \cite{gamBook} introduces the linear model as the generalization of the simple linear model, allowing for the response variable to be explained with multiple predictor variables. Though the linear model generalizes the simple linear model it is not the generalized linear model which will be subject in the next section. Allowing for several predictor variables amounts to rewriting the simple linear model in terms of vectors and matrices resulting in a system of equations. Again, given n observations of $y_i$ and $x_i$ plus some additive constant. tuples we are interested in finding $\mu_i = x_i \beta_i$ which stated as a system of equations takes the following form.
+        \begin{equation}
+        \begin{align*} 
+        \begin{matrix}
+            \mu_1 = \beta_0 + x_1 \beta_1 \\
+            \mu_2 = \beta_0 + x_2 \beta_1 \\
+            ... \\
+            \mu_n = \beta_0 + x_n \beta_1 \\
+        \end{matrix}
+        \end{align*}     
+        \end{equation}
         
-        \begin{equation}  \label{linModel} y\textsubscript{i} = \beta x\textsubscript{i} + \varepsilon\textsubscript{i} \end{equation}
-
-        The are many choices for $\beta$ and finding the best possible $\beta$ stands at the heart of the following chapter. A key feature of linear models is that the linear predictor depends linearly on these parameters. Statistical inference with such models is usually based on the assumption that the response variable has a normal distribution. Linear models are used widely in most branches of science and an example is given in the next section.
+        For the linear model this system of equations must now be rewritten in matrix form resulting in the matrix-vector form. The matrix-vector is a powerful tool to extend existing theory to multiple predictor variables.  
+        \begin{equation}
+       \left[ \begin{array}{c} \mu_1 \\ \mu_2 \\ \mu_3 \\ ... \\  \mu_n\end{array} \right] = \begin{bmatrix} 1 & x_1 \\ 1 & x_2 \\ 1 & x_3 \\ ... \\1 & x_4   \end{bmatrix}  \left[ \begin{array}{c} \beta_0 \\ \beta_1 \end{array} \right]   
+        \end{equation}
         
-        \subsubsection{Least Squares}
-        \subsubsection{Linear Model Example }
+        The matrix-vector form yields the general form the linear model $\mu = X\beta$. This means that the value vector $\mu$ is given by the model matrix X times the unknown parameter vector $\beta$. The model matrix can account for an arbitrary amount of predictor variables by adding a column for each predictor. The nature of the predictor variable: continuous or discrete plays an important role in the construction of the model matrix. Dummy and factor encoding are the two approaches when dealing with factor variables. For an thorough text on factor encoding in linear models see \cite{regression}.  The model matrix is also known as design matrix and the terms are used interchangeably. $\mu = X\beta$ is the canonical form of a linear model. The method for estimating $\beta$ for one predictor do not work for the matrix-vector form and need to adjusted for estimating the unknown vector $\beta$. 
+        
+        \subsubsection{Estimating Linear Models}
+        \cite{gamBook} states estimating the vector of unknown parameters as finding the least squares solution to $\beta$. The linear model in its full form is:
+         
+         \begin{equation}
+             \mu = X \beta, y N(\mu, I_n, \sigma^2)
+         \end{equation}
+        
+        The model matrix $X$ is a matrix with n rows and p columns. With n being the number of observations and p is a product of predictors and their encoding. The least squares estimation for $\beta$ is the best linear unbiased estimator with least variance, \cite{gamBook} provides a full proof. The method for estimating $\beta$ relies on the Euclidean length of a vector which is the sum squared of its elements. For a vector v in n dimensional space the Euclidean length is defined as:
+        
+        \begin{equation}
+            \left \| v \right \|^2 \equiv v^T v \equiv \sum_{n}^{i=1} v^2
+        \end{equation}
+        
+        A relevant information about the Euclidean length is that rotating a matrix does not change the length, the essential method for fitting least squares heavily leverages this fact. This also holds for the rotation of $y-X\beta$. Bootstrapping the Euclidean length to define our measure $S$ in the matrix-vector framework yields
+        
+        \begin{equation}
+           \label{S} S =  \left \| y - \mu \right \|^2 = \| y = X\beta \|^2 
+        \end{equation}
+        
+        The QR decomposition of a matrix is the essential method for estimating $\beta$ and also an essential method for finding generalized additive models. Any real matrix X can always decomposed into an orthogonal matrix and triangular matrix.
+        
+        \begin{equation}
+        X = Q\begin{bmatrix}R \\ 0 \end{bmatrix} = Q_f R
+        \end{equation}
+        
+        $R$ is the upper triangular matrix with p rows and p columns and $Q$ is an orthogonal matrix with n rows and n columns of which the first p columns form $Q_f$. By definition does multiplying a vector with an orthogonal matrix does not change the their length. The matrix algebra appendix provide more detail on there concepts. The QR decomposition separate a matrix in two pieces with out changing their Euclidean length we can thus multiply the problem of least squares with an orthogonal matrix without changing the length. It is important to remember that we are only interested in the length of the vector from \ref{S}. Applying the QR decomposition to \ref{S} the problem of least squares becomes
+        
+        
+        
+        
+        
+        \subsection{Linear Model Example: How good is my jizz?}
+        
+        
         \subsection{Generalized Linear Model}
         \subsubsection{Iterative Reweighted Least Squares}
         \subsubsection{Generalized Linear Model Example}
