@@ -15,6 +15,7 @@
 \usepackage{textgreek}
 \usepackage{listings}
 \usepackage{graphicx}
+\usepackage[]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[margin=1.3in]{geometry}
 
@@ -63,7 +64,7 @@
     
         \section{Statistical Learning}
     
-    The topic of statistical learning might be alien to most computer science undergraduates. Thus, this first section is dedicated to introducing the area along with its problems and naming conventions \cite{hastie} describes Statistical learning as a set of tools for modeling and understanding complex data sets. Recent developments in statistics and computer science have created an interesting field that empowers modern statistical  with powerful computational methods. Statistical learning gives us the ability to ask interesting questions and use to data to find answers. This thesis will focus on one method of the supervised learning branch of statistical learning. Supervised learning methods build a statistical model for predictions and estimations of an output variable based on one or many input variables. Statistical learning methods are a cornerstone of modern scientific research and have given powerful methods to physics, neuroscience, biology, economics and every other relevant science. The professional world has been raving about the potential of statistical learning giving birth terms such as: Data Science and Big Data.
+     \cite{hastie} describes Statistical learning as a set of tools for modeling and understanding complex data sets. Recent developments in statistics and computer science have created an interesting field that empowers modern statistical  with powerful computational methods. Statistical learning gives us the ability to ask interesting questions and use to data to find answers. This thesis will focus on one method of the supervised learning branch of statistical learning. Supervised learning methods build a statistical model for predictions and estimations of an output variable based on one or many input variables. Statistical learning methods are a cornerstone of modern scientific research and have given powerful methods to physics, neuroscience, biology, economics and every other relevant science. The professional world has been raving about the potential of statistical learning giving birth terms such as: Data Science and Big Data.
     
         \subsection{Why statistical learning?}
     
@@ -222,8 +223,9 @@
         Minimizing S w.r.t. $\beta$ to compute $\widehat{\beta}$ is a reasonable approach when dealing with one explanatory variable. The Gauss-Markov theorem shows that estimating $\beta$ with $\widehat{\beta}$ is best linear unbiased estimator. However, most relevant linear models involve more explanatory variables than one. The question for finding must be account for multiple explanatory variables but the measure of fit $S$ remains.
       
         \subsection{Linear Model}
+         \cite{gamBook} introduces the linear model as the generalization of the simple linear model, allowing for the response variable to be explained with multiple predictor variables. Though the linear model generalizes the simple linear model it is not the generalized linear model which will be subject in the next section.
         \subsubsection{Linear Model in the vector-matrix form}
-        \cite{gamBook} introduces the linear model as the generalization of the simple linear model, allowing for the response variable to be explained with multiple predictor variables. Though the linear model generalizes the simple linear model it is not the generalized linear model which will be subject in the next section. Allowing for several predictor variables amounts to rewriting the simple linear model in terms of vectors and matrices resulting in a system of equations. Again, given n observations of $y_i$ and $x_i$ plus some additive constant. tuples we are interested in finding $\mu_i = x_i \beta_i$ which stated as a system of equations takes the following form.
+        Allowing for several predictor variables amounts to rewriting the simple linear model in terms of vectors and matrices resulting in a system of equations. Again, given n observations of $y_i$ and $x_i$ plus some additive constant. tuples we are interested in finding $\mu_i = x_i \beta_i$ which stated as a system of equations takes the following form.
         \begin{equation}
         \begin{align*} 
         \begin{matrix}
@@ -261,7 +263,7 @@
            \label{S} S =  \left \| y - \mu \right \|^2 = \| y = X\beta \|^2 
         \end{equation}
         
-        The QR decomposition of a matrix is the essential method for estimating $\beta$ and also an essential method for finding generalized additive models. Any real matrix X can always decomposed into an orthogonal matrix and triangular matrix.
+        \cite{gamBook} describes QR decomposition of a matrix as the essential method for estimating $\beta$ and also an essential method for finding generalized additive models. Any real matrix X can always decomposed into an orthogonal matrix and triangular matrix.
         
         \begin{equation}
         X = Q\begin{bmatrix}R \\ 0 \end{bmatrix} = Q_f R
@@ -269,14 +271,68 @@
         
         $R$ is the upper triangular matrix with p rows and p columns and $Q$ is an orthogonal matrix with n rows and n columns of which the first p columns form $Q_f$. By definition does multiplying a vector with an orthogonal matrix does not change the their length. The matrix algebra appendix provide more detail on there concepts. The QR decomposition separate a matrix in two pieces with out changing their Euclidean length we can thus multiply the problem of least squares with an orthogonal matrix without changing the length. It is important to remember that we are only interested in the length of the vector from \ref{S}. Applying the QR decomposition to \ref{S} the problem of least squares becomes
         
+        \begin{equation}
+             \left \| y - X\beta^2\right \|  =  \left \| Q^Ty - Q^T^ X\beta^2\right  \| =  \| Q^T-y \begin{bmatrix} R \\ 0 \end{bmatrix} \beta \|^2
+        \end{equation}
+        
+        Only the orthogonal matrix of the QR decomposed model matrix gets multiplies to the the response variable vector and the original model matrix. Multiplying $Q^T$ with the response vector can be stated as $Q^T y = \begin{bmatrix} f \\ r \end{bmatrix}$,where f is vector of dimension p, and hence r is a vector of dimension n − p, yields
+        
+        \begin{equation}
+            \left \| y - X\beta\right \|^2  =  \left \| \begin{bmatrix} f \\ r \end{bmatrix} - \begin{bmatrix} R \\ 0 \end{bmatrix}\beta\right \|^2 =  \| f-R \beta \|^2 + \|r \|^2
+        \end{equation}
+        
+        a form that exposes the residual error $r$ as independent of $\beta$. $\| f - R \beta \|^2$ can be reduced to zero by choosing $\beta$ so that $R\beta$ equals $f$, thus the estimator $\widehat{\beta}$ can be stated as 
+        
+        \begin{equation}
+            \widehat{\beta} = R^-1 f
+        \end{equation}
+        
+        The reducible error, also called residual error is the difference between the model matrix multiplies with the estimated $\beta$ minus the value for y. $\|r\|^2 = \|y-X \widehat{\beta\x}\|^2$
+        
+    \subsubsection{Influence Matrix}
+    The influence matrix or hat matrix is required for the prediction piece of linear models and plays an important role for generalized additive models. \cite{gamBook} introduced the influence matrix as the required matrix ,when post multiplied by the data vector $y$, yields the predicted fitted value vector $\widehat{\mu}$. The influence matrix is required to compute actual estimated value vector. The first p columns of Q make up the matrix $Q_f$. $f$ is then defined as $f = Q_f y$ which implies that 
+    
+    \begin{equation}
+        \widehat{\beta} = R^-1 Q_f^T y 
+    \end{equation}
+    
+    Given that $\widehat{\mu} = X \widehat{\beta}$ and $X = Q_fR$ the fitted value vector can be written as 
+    \begin{equation}
+        \widehat{\mu} = Q_f RR^-1 y = Q_fQ_f^T_f y  
+    \end{equation}
+    Since the upper triangular matrix $R$ is multiplied its inverse we can factor them out resulting with the hat matrix $A \equiv Q_f Q_f^T$ that fulfills $\widehat{\mu} = Ay$.
+    
+    \subsubsection{Linear Model Example}
         
         
-        
-        
-        \subsection{Linear Model Example: How good is my jizz?}
-        
-        
-        \subsection{Generalized Linear Model}
+    \subsection{Generalized Linear Model}
+    \cite{glm} introduces generalized linear models (GLMs) as an extension of the general linear model with the ability to model more exponential family response distributions. While linear models only allow for a normal distributed response, GLMs allows to model the response variable from any arbitrary ex potential family. The exponential family of distributions contains many practical useful distributions. A formal description of it's basis structure can be given as
+
+        \begin{equation} g(\mu_i) = X_i \beta_i \end{equation}
+
+
+   $X_i$ is the $i^th$ row of a model matrix X and $\beta$ is a vector of unknowns parameters with $\mu_i \equiv E(Y_i)$ and $Y_i$ is distributed according to some exponential family. The family of expontential functions include but are not limited to Poisson, Bionomial, Gamma and Normal Distributions. Every exponential family distribution has a link function $g()$. The link function allows that the linear functions of the predictor variables are obtained by transforming the right side of the equation $f(x)$. The data are then fit in this transformed scale but the expected variance is calculated on the original scale of the predictor variables.  The link functions allows us to model an exponential function ins terms of a linear link function. Fitting several distributions with a single framework at a cost: While the least squares approach was sufficient for estimating $\beta$ for normal distributed data with zero mean error the generalized estimation method has to account for an arbitrary amount of distribution parameters. The generalization of least squares is called maximum likelihood estimation (MLE) and involves an iterative method called iterative re-weighted least squares (IRLS). An important practical feature of generalized linear models is that they can all be fit to data using IRLS, independant of response variable distribution. A further layer of complexity is the error term now has varying variance, our estimations and inference needs weight the likelihood accordingly.
+ 
+    \subsubsection{Maximum-Likelihood Estimation}
+    
+    \cite{MLE} gives a detailed theoretical introduction for maximum likelihood estimation. The author describes a general framework for parameter estimation for any exponential distribution. Random variables and their distribution explain a variables behavior based on their parameters. Given a set of parameters, a distribution and data t . Goodness of fit is assessed by finding parameter values of a model that best fits the data procedure called parameter estimation. The least squares linear model estimated the $\mu$ and $\sigma$ for $N( \mu ,\sigma^2)$ by minimizing $S$. \cite{glm} introduces a method to account estimate parameters for any exponential family distributions members. Exponential family distributions have arbitrary number of parameters and parameter meaning, cf.  $P(\lambda)$ $G(K,\theta)$. Maximum likelihood estimation provides a single framework to allow parameter estimation for any of the exponential family distributions.
+
+    From a statistical analysis point of view the vector $y$ of observed data is a random sample from an unknown population. The goal of maximum likelihood estimation is to find the parameters of the given distribution that most likely has produced this sample. This process is described with a probability density function (PDF) $f()$ of observed data $y$ given a parameter $w$: $f(y|w)$. If individual observations, $y_i$’s, are statistically independent of one another, then according to the theory of probability, the PDF for the data y given the parameter vector $w$ can be expressed as a multiplication of PDFs for individual observations.
+
+    \begin{equation} f(y|w) = f((y_1, y_2,...,y_n) | (w_1,w_2, ... w_n )) = \prod_{i=1}^{n} f_i(y_i|w_i) ) \end{equation}
+
+    Given a set of parameter values, the corresponding PDF will show that some data are more probable than other data. The change In reality the data is already given and we are searching for the parameters of the distribution that most likely produced the data. Most likely is referring to maximizing likelihood. We thus inverse our function $f(y|w)$ to $L(w|y)$ to produce the likelihood of y given the parameters w. The principle of maximum likelihood estimation, originally developed by R.A. Fisher in the 1920s, states that the desired probability distribution is the one that makes the observed data ‘‘most likely,’’ which means that one must seek the value of the parameter vector that maximizes the likelihood function $L(w|y)$: The resulting parameter vector, which is sought by searching the multi-dimensional parameter space, is called the MLE estimate.
+
+    Theoretically MLE estimates need not exist nor be unique. But if they exist and are unique they can be estimated. For computational convenience, the MLE estimate is obtained by maximizing the log-likelihood function, $ln(L(w|y))$: This is because the two functions, $ln(L(w|y))$ and $L(w|y)$; are monotonically related to each other so the same MLE estimate is obtained by maximizing either one and the log-likelihood is prefered for obvious reasons. Assuming that the log-likelihood function, $ln(L(w|y))$ is differentiable, if wMLE exists, it must satisfy the following partial differential equation known as the likelihood equation:
+
+    \begin{equation} \frac{\partial ln L(w|y)}{\partial w_i} = 0 \end{equation}
+
+    This is because the definition of maximum or minimum of a continuous differentiable function implies that its first derivatives vanish at such points. The likelihood equation represents a necessary condition for the existence of an MLE estimate. An additional condition must also be satisfied to ensure that ln $ln(L(w|y))$ is a maximum and not a minimum, since the first derivative cannot reveal this. To be a maximum, the shape of the log-likelihood function should beconvex (it must represent a peak, not a valley) in the neighborhood of wMLE: This can be checked by calculating the second derivatives of the log-likelihoodsand showing whether they are all negative.
+
+    \begin{equation} \frac{\partial^2 ln L(w|y)}{\partial w^2_i} < 0 \end{equation}
+
+    In practice, however, it is usually not possible to obtain an analytic form solution for the MLE estimate, especially when the model involves many parameters and its PDF is highly non-linear. In such situations, the MLE estimate must be sought numerically using nonlinear optimization algorithms. The basic idea of nonlinear optimization is to quickly find optimal parametersthat maximize the log-likelihood. This is done by searching much smaller sub-sets of the multi-dimensional parameter space rather than exhaustively searching the whole parameter space, which becomes intractable as the number of parameters increases. The ‘‘intelligent’’ search proceeds by trial and error over the
+    course of a series of iterative steps. Specifically, on eachiteration, by taking into account the results from the previous iteration, a new set of parameter values is obtained by adding small changes to the previous parameters in such a way that the new parameters are likely to lead to improved performance. Different optimization algorithms differ in how this updating routine is conducted. This process is called
         \subsubsection{Iterative Reweighted Least Squares}
         \subsubsection{Generalized Linear Model Example}
     
@@ -284,8 +340,9 @@
         \subsection{Regression Splines}
             \subsubsection{Basis Functions}
             \subsubsection{Cyclic Cubic Regression Splines}
+        \subsubsection{Fitting Generalized Additive Models}
         \subsection{Penalized Iterative Reweighted Least Squares}
-        \subsection{Generalized Additive Models Example}
+        \subsection{Generalized Additive Model Example}
     
     \section{Numerical Optimizations For Large Data Sets}
     
@@ -293,7 +350,8 @@
         \subsection{General In Memory Cluster Computing Framework}
         \subsection{The Language Scala and Breeze}
         \subsection{Machine Learning Pipeline}
-        \subsection{Implementing Generalized Additive Models in Apache Spark}
+    
+    \subsection{Implementing Generalized Additive Models in Apache Spark}
     
     \section{Matrix Algebra Appendix}
         \subsection{QR Decomposition}
