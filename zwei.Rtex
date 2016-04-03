@@ -311,29 +311,133 @@
         \begin{equation} g(\mu_i) = X_i \beta_i \end{equation}
 
 
-   $X_i$ is the $i^th$ row of a model matrix X and $\beta$ is a vector of unknowns parameters with $\mu_i \equiv E(Y_i)$ and $Y_i$ is distributed according to some exponential family. The family of expontential functions include but are not limited to Poisson, Bionomial, Gamma and Normal Distributions. Every exponential family distribution has a link function $g()$. The link function allows that the linear functions of the predictor variables are obtained by transforming the right side of the equation $f(x)$. The data are then fit in this transformed scale but the expected variance is calculated on the original scale of the predictor variables.  The link functions allows us to model an exponential function ins terms of a linear link function. Fitting several distributions with a single framework at a cost: While the least squares approach was sufficient for estimating $\beta$ for normal distributed data with zero mean error the generalized estimation method has to account for an arbitrary amount of distribution parameters. The generalization of least squares is called maximum likelihood estimation (MLE) and involves an iterative method called iterative re-weighted least squares (IRLS). An important practical feature of generalized linear models is that they can all be fit to data using IRLS, independant of response variable distribution. A further layer of complexity is the error term now has varying variance, our estimations and inference needs weight the likelihood accordingly.
+   $X_i$ is the $i^th$ row of a model matrix X and $\beta$ is a vector of unknowns parameters with $\mu_i \equiv E(Y_i)$ and $Y_i$ is distributed according to some exponential family. The family of expontential functions include but are not limited to Poisson, Bionomial, Gamma and Normal Distributions. Every exponential family distribution has a link function $g()$. The link function allows that the linear functions of the predictor variables are obtained by transforming the right side of the equation $f(x)$. The data are then fit in this transformed scale but the expected variance is calculated on the original scale of the predictor variables.  The link functions allows us to model an exponential function ins terms of a linear link function. Fitting several distributions with a single framework at a cost: While the least squares approach was sufficient for estimating $\beta$ for normal distributed data with zero mean error the generalized estimation method has to account for an arbitrary amount of distribution parameters. The generalization of least squares is called maximum likelihood estimation (MLE) and involves an iterative method called iterative reweighted least squares (IRLS). An important practical feature of generalized linear models is that they can all be fit to data using IRLS, independant of response variable distribution. 
  
     \subsubsection{Maximum-Likelihood Estimation}
     
-    \cite{MLE} gives a detailed theoretical introduction for maximum likelihood estimation. The author describes a general framework for parameter estimation for any exponential distribution. Random variables and their distribution explain a variables behavior based on their parameters. Given a set of parameters, a distribution and data t . Goodness of fit is assessed by finding parameter values of a model that best fits the data procedure called parameter estimation. The least squares linear model estimated the $\mu$ and $\sigma$ for $N( \mu ,\sigma^2)$ by minimizing $S$. \cite{glm} introduces a method to account estimate parameters for any exponential family distributions members. Exponential family distributions have arbitrary number of parameters and parameter meaning, cf.  $P(\lambda)$ $G(K,\theta)$. Maximum likelihood estimation provides a single framework to allow parameter estimation for any of the exponential family distributions.
+    \cite{glm} describes the principle of maximum likelihood estimation (MLE) as searching for a probability distribution that makes the observed data most likely. This results in a search for the parameter vector that maximizes the likelihood function $L(\beta|y)$. The parameter vector is found by searching the multi-dimensional parameter space.
 
-    From a statistical analysis point of view the vector $y$ of observed data is a random sample from an unknown population. The goal of maximum likelihood estimation is to find the parameters of the given distribution that most likely has produced this sample. This process is described with a probability density function (PDF) $f()$ of observed data $y$ given a parameter $w$: $f(y|w)$. If individual observations, $y_i$’s, are statistically independent of one another, then according to the theory of probability, the PDF for the data y given the parameter vector $w$ can be expressed as a multiplication of PDFs for individual observations.
+    \cite{MLE} describes MLE as finding the parameters for a distribution that were most likely to produce the given data. Random variable are defined in terms of one or several parameters. A good choice of parameters results in a distribution that emulates the given data. The least squares linear model estimated the $\mu$ and $\sigma$ for $N( \mu ,\sigma^2)$ by minimizing $S$ is a special case of the MLE, only allowing for normal distributed data. \cite{glm} introduces a method to account estimate parameters for any exponential family distributions members. Exponential family distributions have arbitrary number of parameters and parameter meaning, for example.  $P(\lambda)$ $G(K,\theta)$. Maximum likelihood estimation provides a single framework to allow parameter estimation for any of the exponential family distributions.
 
-    \begin{equation} f(y|w) = f((y_1, y_2,...,y_n) | (w_1,w_2, ... w_n )) = \prod_{i=1}^{n} f_i(y_i|w_i) ) \end{equation}
+    From a statistical analysis point of view the vector $y$ of observed data is a random sample from an unknown population. The goal of maximum likelihood estimation is to find the parameters of the given distribution that most likely has produced this sample. This process is described with a probability density function (PDF) $f()$ of observed data $y$ given a parameter $\beta$: $f(y|w)$. If individual observations, $y_i$’s, are statistically independent of one another, the PDF for the data $y$ given the parameter vector $\beta$ can be expressed as a multiplication of PDFs for individual observations.
 
-    Given a set of parameter values, the corresponding PDF will show that some data are more probable than other data. The change In reality the data is already given and we are searching for the parameters of the distribution that most likely produced the data. Most likely is referring to maximizing likelihood. We thus inverse our function $f(y|w)$ to $L(w|y)$ to produce the likelihood of y given the parameters w. The principle of maximum likelihood estimation, originally developed by R.A. Fisher in the 1920s, states that the desired probability distribution is the one that makes the observed data ‘‘most likely,’’ which means that one must seek the value of the parameter vector that maximizes the likelihood function $L(w|y)$: The resulting parameter vector, which is sought by searching the multi-dimensional parameter space, is called the MLE estimate.
+    \begin{equation} f(y|\beta) = f((y_1, y_2,...,y_n) | (\beta_1,\beta_2, ... \beta_n )) = \prod_{i=1}^{n} f_i(y_i|\beta_i) ) \end{equation}
 
-    Theoretically MLE estimates need not exist nor be unique. But if they exist and are unique they can be estimated. For computational convenience, the MLE estimate is obtained by maximizing the log-likelihood function, $ln(L(w|y))$: This is because the two functions, $ln(L(w|y))$ and $L(w|y)$; are monotonically related to each other so the same MLE estimate is obtained by maximizing either one and the log-likelihood is prefered for obvious reasons. Assuming that the log-likelihood function, $ln(L(w|y))$ is differentiable, if wMLE exists, it must satisfy the following partial differential equation known as the likelihood equation:
+    Given a set of parameter values, the corresponding PDF will show that some data are more probable than other data. The change In reality the data is already given and we are searching for the parameters of the distribution that most likely produced the data. Most likely is referring to maximizing likelihood. We thus inverse our function $f(y|\beta)$ to $L(\beta|y)$ to produce the likelihood of $y$ given the parameters w. Theoretically MLE estimates need not exist nor be unique. But if they exist and are unique they can be estimated. For computational convenience, the MLE estimate is obtained by maximizing the log-likelihood function, $ln(L(\beta|y))$: This is because the two functions, $ln(L(\beta|y))$ and $L(w|y)$; are monotonically related to each other so the same MLE estimate is obtained by maximizing either one and the log-likelihood is preferred for obvious reasons. Assuming that the log-likelihood function, $ln(L(\beta|y))$ is differentiable, if w exists, it must satisfy the following partial differential equation known as the likelihood equation:
 
-    \begin{equation} \frac{\partial ln L(w|y)}{\partial w_i} = 0 \end{equation}
+    \begin{equation} \frac{\partial ln L(\beta|y)}{\partial \beta_i} = 0 \end{equation}
 
-    This is because the definition of maximum or minimum of a continuous differentiable function implies that its first derivatives vanish at such points. The likelihood equation represents a necessary condition for the existence of an MLE estimate. An additional condition must also be satisfied to ensure that ln $ln(L(w|y))$ is a maximum and not a minimum, since the first derivative cannot reveal this. To be a maximum, the shape of the log-likelihood function should beconvex (it must represent a peak, not a valley) in the neighborhood of wMLE: This can be checked by calculating the second derivatives of the log-likelihoodsand showing whether they are all negative.
+    This properties are given because the definition of maximum or minimum of a continuous differentiable function implies that its first derivatives vanish at such points. The likelihood equation represents a necessary condition for the existence of an MLE estimate. An additional condition must also be satisfied to ensure that $ln(L(\beta|y))$ is a maximum and not a minimum, since the first derivative cannot reveal this. The log likelihood must be convex near w. This is verified by calculating the second derivatives of the log-likelihoods and checking if they are negative.
 
-    \begin{equation} \frac{\partial^2 ln L(w|y)}{\partial w^2_i} < 0 \end{equation}
+    \begin{equation} \frac{\partial^2 ln L(\beta|y)}{\partial \beta^2_i} < 0 \end{equation}
 
-    In practice, however, it is usually not possible to obtain an analytic form solution for the MLE estimate, especially when the model involves many parameters and its PDF is highly non-linear. In such situations, the MLE estimate must be sought numerically using nonlinear optimization algorithms. The basic idea of nonlinear optimization is to quickly find optimal parametersthat maximize the log-likelihood. This is done by searching much smaller sub-sets of the multi-dimensional parameter space rather than exhaustively searching the whole parameter space, which becomes intractable as the number of parameters increases. The ‘‘intelligent’’ search proceeds by trial and error over the
-    course of a series of iterative steps. Specifically, on eachiteration, by taking into account the results from the previous iteration, a new set of parameter values is obtained by adding small changes to the previous parameters in such a way that the new parameters are likely to lead to improved performance. Different optimization algorithms differ in how this updating routine is conducted. This process is called
-        \subsubsection{Iterative Reweighted Least Squares}
+    This form is only of theoretical value as practical model often involves many parameters and have highly non-linear PDFs. Thus the estimate must be sought numerically using nonlinear optimization methods. The basic idea for these methods is to find optimal parameters that maximize the log-likelihood focusing on smaller sub-sets of the multi-dimensional parameter space. This is the preferred because exhaustively searching the whole parameter space becomes intractable with an increasing amount of parameters. The practical method for MLE searches by trial and error over the course of a series of iterative steps. Each iteration changes the results from the previous iteration by a small value. The choice of the value is tailored to improve the log-likelihood. This most prominent method is called iterative reweighted least squares and subject in the next section.
+        
+        \subsubsection{Fitting Generalized Linear Models}
+    
+    \cite{gamBook} introduces iterative reweighted least squares (IRLS) as the practical method for fitting GLMs. The method method must find the distribution parameters and account for unequal variance. GLM models an n-vector of independent response variables $Y$, where $\mu$ is the expected value of $Y$ as:
+    
+    \begin{equation}
+        g(\mu_i) = X_i \beta
+    \end{equation}
+    
+    With $\mu \equiv E(Y)$ and the link transformation of $Y_i$ as $Y_i \approx f_\theta_i (y_i)$ where $f_\theta_i$ stands for the canonical link transformation of an exponential family distribution. The value of $mu_i$ is the to determined by finding $\beta$. With this in mind the probability mass function for any exponential family distribution can be written as:
+    
+    \begin{equation}
+        f_\theta = exp[\{y\theta-b(\theta)\}/a(\phi)+c(y, \phi)]
+    \end{equation}
+    
+    $a,b$ and $c$ are arbitrary functions, $\phi$ an arbitrary scale parameter and the $\theta$ the canonical link parameters. The interesting property of this form is that the general expression for mean and variance of exponential family distributions can be expressed in terms of $a,b$ and $\phi$. The mean and the variance are the required parameters to fit any exponential family distribution and are computed via deriving the log-likelihood. Since the natural logarithm is the inverse of the exponential function the log-likelihood has a familiar form.
+    
+    \begin{equation}
+        l(\theta) = [y\theta - b(\theta)] / a(\phi) + c(y,\phi) 
+    \end{equation}
+    
+    $E(Y)$ can now computing by differentiating $l$ w.r.t. $\theta$ and treating $l$ as a random variable. This amounts to replacing the particular value $y$ with the random variable $Y$.
+    
+    \begin{equation}
+        \frac{\partial l }{\partial \theta} = [y-{b}'(\theta))]/a(\phi))    
+    \end{equation}
+    
+    \begin{equation}
+        E(\frac{\partial l }{\partial \theta}) = [E(Y)-{b}'(\theta))]/a(\phi))
+    \end{equation}
+    
+    Given that $E(\partial l / \partial \theta) = 0$ the expected value of the random variable Y can be stated as:
+    
+    \begin{equation}
+        E(Y) = {b}'(\theta)
+    \end{equation}
+    
+    This results in a method to compute the mean of any exponential family random variable by the first derivative of b w.r.t $\theta$. This the direct link between the $\beta$ and the model parameter. Allowing the parameter $\beta$ to determine the mean of the response variable and consequentially the canonical parameter is the proper way to find that value. The variance of that random variable can be computed from the second derivative of the log-likelihood:
+    
+    \begin{equation}
+        \frac{\partial^2 l }{\partial^2 \theta} = -{b}''(\theta)/a(\phi)
+    \end{equation}
+    
+    \cite{gamBook} states that re-arranging this formula yields the equation for the variance of $Y$.
+    
+    \begin{equation}
+        var(Y) = {b}''(\theta) a(\phi)
+    \end{equation}
+    
+    A very important feature of GLMs is that the variance can vary. To account for varying variance the variance is divided by a weight $w$ that penalizes data points with high relative variance.
+    
+    \begin{equation}
+        var(Y) = {b}''(\theta) a(\phi)/w
+    \end{equation}
+    
+    For simplicity the function $V(\mu)$ is defined as $V(\mu) = {b}''(\theta)$ such that $var(Y) = V\(\mu)$.
+    
+    Given vector $y$ of an observation random variable $Y$ the maximum likelihood estimation of $\beta$ is possible due to the independence of all $Y_i$. The formal notation for the MLE of the likelihood of $\beta$, $L(\beta)$ becomes
+    
+    \begin{equation}
+        L(\beta) \prod_{i=1}^{n} f_\theta_i (y_i)
+    \end{equation}
+    
+    Given the previously stated the probability mass function for exponential family members the log likelihood $l()$ of $\beta$ can be written as:
+    
+    \begin{equation}
+        l(\beta) = \sum_{i=1}^{n} log[f_\theta_i(y_i))] = \sum_{i=1}^{n} (y_i\theta_i-b_i(\theta_i)) /a_i(\phi)+c_i(y_i, \phi)
+    \end{equation}
+    
+    The log function transforms the product to a sum. $\phi$ is assumed to be constant for all $i$ and \cite{gamBook} states that only choices for $\phi$ are relevant that can be stated as $a_i(\phi) = \phi / w_i$ with $w_i$ being a constant. This assumption allows us the rewrite the previous formula as
+    
+    \begin{equation}
+        l(\beta) = \sum_{i=1}^{n}\ w_i(y_i\theta_i-b_i(\theta_i)\)/a_i(\phi)+c_i(y_i, \phi)
+    \end{equation}
+    
+    The process of finding the parameter vector $\beta$ amounts to maximizing the log-likelihood by partially differentiating $l$ w.r.t. each element of $\beta$, setting the resulting expressions to zero and solving for $\beta$.
+    
+    
+    \begin{equation}
+    \frac{\partial l }{\partial \beta_j} = 
+     \sum_{i=1}^{n} w_i \begin{pmatrix} y_i \frac{\partial \theta_i }{\partial \beta_j} - {b}'(\theta_i) \frac{\partial \theta_i }{\partial \beta_j} \end{pmatrix}
+    \end{equation}
+    
+    \cite{gamBook} details that applying the chain rule,  $E(Y) = {b}'(\theta)$ and term substitution the following form can be produced:
+    
+    \begin{equation}
+        \frac{\partial l }{\partial \beta_j} = \frac{1}{\phi} \sum_{i=1}^{n} \frac{[y_i - {b_i}'(\theta_i)]}{b''_i(\theta_i)/w_i} \frac{\partial \mu_i }{\partial \beta_j}
+    \end{equation}
+    
+    Applying the framework developed above to determine variance and expected value the full form for the estimation of $\beta$ can be stated as:
+    
+    \begin{equation}
+         \sum_{i=1}^{n} \frac{(y_i - \mu_i)^2}{V(\mu_i)} \frac{\partial \mu_i }{\partial \beta_j} = 0 \ \forall \ j.
+    \end{equation}
+    
+    This matches exactly the same equation that would have to be solved to find $\beta$ by non-linear weighted least squares if the weights for $(V(\mu_i)$ were known in advance and were independent of $\beta$. In that scenario the least square objective would be
+    
+      \begin{equation}
+          S = \sum_{i=1}^{n} \frac{(y_i - \mu_i)^2}{V(\mu_i)}
+      \end{equation}
+    
+    In the formulation $\mu_i$ depends non-linearly on $\beta$ but the weights $V(\mu)$ are treated as fixed. To find the least squares estimated $\partial S / \partial \beta_j$ must equal to zero for all js. Formulating the search for $\beta$ as finding the optimal choice of distribution parameters of $Y$ invites an iterative approach that chooses some parameter values and e .\cite{gamBook} describes this process formally. Let $\widehat{\beta}^{[k]}$
+    
+    
+
+        
         \subsubsection{Generalized Linear Model Example}
     
     \section{Generalized Additive Models}
