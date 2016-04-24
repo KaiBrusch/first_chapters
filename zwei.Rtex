@@ -713,11 +713,102 @@
     The discussed methods allow to fit a regression spline to a single variable. Almost all relevant model have more than one variable. The additive model allows to model the response as the sum of several predictors. \cite{gamBook} formally describes the additive model as:
     
     \begin{equation}
-        y_i = f_1(x_i) + f_2(z_i) + \epsilon_i
+        y_i = f_1(x_i) + f_2(z_i) ... f_n(w_i)  + \epsilon_i
     \end{equation}
     
-    The  functions $f_j$ are smooth functions estima
+    The functions $f_j$ are smooth functions estimated with the methods introduced in the previous sections. The error term $\epsilon$ is distributed according to an independent identically distributed $N(0,\sigma^2)$. Modelling $y_i$ as the sum of individual smoothing functions rather than a single function of all terms imposes a very strong condition. $f_1(x) + f_2(z)$ is a special case of the of the general smooth function of both predictors $f(x,z)$. The benefit of modeling each function individually is that each predictor maintains the interpretability of the linear model. Estimating $f(x,z)$ would provide superior flexibility but drastically decreased interpretable. The individual smooth function are a major benefit of the additive model. Fitting additive model with by the methods used for a single regression spline amounts to rewriting the penalty term. Instead of penalizing a single spline both splines no need to be penalized. The unknown parameter vector $\beta$ for the additve model can be estimated by the minimization of the penalized least squares objective.
     
+    \begin{equation}
+        \left \| y- X\beta \right \| ^2 + \lambda_1 \beta^T S_1 \beta + \lambda_2 \beta^T S_2 \beta
+    \end{equation}
+    
+    Each smoothing function gets estimated with an individual penalty matrix $S_i$ and a smoothing parameter $\lambda_i$. The additive nature of the model allows to write the combined penalty as $S \equiv \lambda_1 S_1 + \lambda_2 S_3$. The ability to rewrite the penalty matrix as the addition of the individual penalty matrices and smoothing parameter allows to rewrite the least squares objective for computation.
+    
+    \begin{equation}
+        \label{penalty}
+        \left \| y- X\beta \right \| ^2 +  \beta^T S \beta = \left\|  \begin{bmatrix} y\\ 0
+        \end{bmatrix} - \begin{bmatrix} X\\  B \end{bmatrix} \beta \right\| ^2
+    \end{equation}
+    
+    Similar to the single smoothing function the $B$ is any square root matrix such that $B^TB=S$. Summing the different $\lambda$ and $S$ terms in to the square root matrix allow this model to be estimated with the standard linear model. To illustrate an additive model \cite{gamBook} defines an additive model in two steps. One method to set up the model and the penalty matrices. The second the estimate the models with  smoothing parameters. 
+     <<>>=
+    am.setup<-function(x,z,q=10)
+        # Get X, S_1 and S_2 for a simple 2 term AM 
+        { 
+        # generate equidistant knots
+        xk <- quantile(unique(x),1:(q-2)/(q-1))
+        zk <- quantile(unique(z),1:(q-2)/(q-1))
+        # Generate two individual, non-overlaping penalty matricies
+        S <- list()
+        S[[1]] <- S[[2]] <- matrix(0,2*q-1,2*q-1) 
+        S[[1]][2:q,2:q] <- spl.S(xk)[-1,-1] 
+        S[[2]][(q+1):(2*q-1),(q+1):(2*q-1)] <- spl.S(zk)[-1,-1] #     
+        # Set up the model matrix X
+            n<-length(x)
+            X<-matrix(1,n,2*q-1)
+            X[,2:q]<-spl.X(x,xk)[,-1]               # 1st smooth
+            X[,(q+1):(2*q-1)]<-spl.X(z,zk)[,-1]     # 2nd smooth
+            list(X=X,S=S)
+        }
+
+    @ 
+   
+    The function am.setup generates the model matrix and the penalty matrices for two predictor variables and a fixed set of equidistant knots. The knots are an arbitrary choice and only for illustrative purposes. A key aspect is that the function sets up two penalty matrices. To maintain the additive property each penalty matrix gets placed in full penalty matrix that is zeroes outside of the individual penalty matrix. The full penalty matrix has the size of n rows and number of parameters times penalty matrices. For example the first penalty matrix is covers all rows of for the first number of parameters columns and is zero otherwise. The second penalty matrix is 0 for the previous matrix was defined. Setting the penalty matrix up this way allows to estimate the smoothing parameter individually in the next function. The constructed model matrix $X$ and the list of penalty matrices are now sufficient to estimate an additive model.
+   
+    <<>>=
+    fit.am<-function(y,X,S,sp)
+        # function to fit simple 2 term additive model 
+        { # generate the full penalty matrix and take square root
+        rS <- mat.sqrt(sp[1]*S[[1]]+sp[2]*S[[2]])
+        q <- ncol(X) # number of params
+        n <- nrow(X)
+        X1 <- rbind(X,rS) 
+        y1<-y;y1[(n+1):(n+q)]<-0 # augment data 
+        b<-lm(y1~X1-1) # fit model 
+        trA<-sum(influence(b)$hat[1:n]) # tr(A) 
+        norm<-sum((y-fitted(b)[1:n])^2) # RSS 
+        list(model=b,gcv=norm*n/(n-trA)^2,sp=sp)
+    }
+    @
+   
+    
+    The function fit.am takes the previously generated model and penalty matrix a vector of $y$ values and a vector of smoothing parameter values and produces a list of the model and the gcv score. Each penalty matrix receives an individual smoothing parameter. Defining the full penalty matrix as zero outside of the individual penalty matrix allows to multiply the smoothing parameter and then add the individual matrices to form the full penalty matrix $rS$. The model matrix on top of the penalty matrix form the complete model matrix $X$. Since the model matrix has more rows that the data  vector $y$ the data vectors receives zeroes to match. The resulting model is then fit via the linear model from section one. After the model is fit the gcv score gets computed and gets stored.
+    
+    \subsection{Additive Model Example}
+    The process of fitting a two term additive model can be best understood by using the  setup.am and fit.am functions on a data set. \cite{gamBook} uses the default R data set $trees$. This data set contains three variables: Volume, Girth and Height for 31 felled cherry trees. The author suggests the following model to illustrate an additive model
+    \begin{equation}
+        Volumne = f_1(Girth) + f_2(Height) + \epsilon_i
+    \end{equation}
+    
+    This model can be estimated with the functions defined in the previous section. 
+    
+     <<>>=
+    data(trees)
+    rg <- range(trees$Girth)
+    rh <- range(trees$Height)
+    # rescaling of parameter to onto [0,1]
+    trees$Girth <- (trees$Girth - rg[1])/(rg[2]-rg[1]) 
+    trees$Height <- (trees$Height - rh[1])/(rh[2]-rh[1])
+    am0 <- am.setup(trees$Girth,trees$Height)
+    @
+    The model matrix and the penalty matricies get setup with the rescaled parameters of Girth and Height. The resulting list can then be used to estimate the full model but not the smoothing parameter. To estimate the smoothing parameter the fit.am functions gets called with several choices of $\lambda$. The $\lambda$ that generates the lowest gcv score is estimated by iteratively trying different $\lambda$ values.  
+    
+    <<>>=
+    sp<-c(0,0) # initialize smoothing parameter (s.p.) array 
+    for (i in 1:30) for (j in 1:30) # loop over s.p. grid
+    { 
+        sp[1]<-1e-5*2^(i-1);sp[2]<-1e-5*2^(j-1)     # s.p.s 
+        b<-fit.am(trees$Volume,am0$X,am0$S,sp)      # fit using s.p.s.
+        if (i+j==2) best<-b else                    # number of data
+        if (b$gcv<best$gcv) best<-b                 # augmented X
+    }
+    best$sp # GCV best smoothing parameter 
+    @
+    
+    If the best 
+    
+    
+   
     \subsection{Generalized Additive Model}
     \subsubsection{Penalized Iterative Reweighted Least Squares}
     \subsubsection{Generalized Additive Model Example}
@@ -731,15 +822,16 @@
         \subsubsection{Transformer}
         \subsubsection{Estimator}
         \subsection{Implementing GAM in Apache Spark}
+        \subsection{R vs Spark vs SparkR}
         \subsubsection{Architecture}
         
         
 
     \section{Experiment: Fitting GAMs for large data sets}
-    \subsection{Fitting a large gam with Airbnb data}
+    \subsection{Fitting a large GAM with Airbnb data}
         \subsubsection{Why GAMs for Airbnb}
         \subsubsection{Fitting seasonality with GAMs}
-    \subsection{How does the performance compare to mgcv?}
+    \subsection{How does the performance compare to R?}
         \subsubsection{Memory}
         \subsubsection{CPU}
     \subsection{How does the performance scale?}
