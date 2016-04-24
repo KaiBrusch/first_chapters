@@ -32,7 +32,10 @@
 
 
 \title{
-    Fitting Generalized Additive Models for\\ very large data sets with Apache Spark \\[7pt]
+    Fitting Generalized Additive Models for\\ very large data sets with Apache Spark \\ or \\ 
+    Fitting Generalized Additive Models with Apache Spark\\ or \\
+    Fitting Generalized Addittve Models for very large data sets
+    \\[7pt]
     \large Chapter Excerpt
 }
 \date{Future}
@@ -68,7 +71,7 @@
     
         \subsection{Why statistical learning?}
     
-    Ideas are sometimes best conveyed through example. \cite{hastie} illustrated the benefits of statistical learning on a simple yet illustrative example. In the example we assume the be working for as statistical consultant in charge of advising a client on how to improve the sales of a given product. The client provides us with a data set containing the sales of a given product across several markets along with the budged for the product in each market in three different media outlets: TV, radio and newspaper. The client is not able to directly impact the amount of sales but he may to change amount spend on each media outlet. If we can understand the number of items sold as a function of spend on media we can suggest our client to adjust spending to increase units sold. In \ref{fig:sales} the sales are plotted on the Y axis and the budget for a media outlet on the X axis. \cite{hastie} uses this example to introduce terminology as well as the framework. The media budgets are the input variable and sales are the output variables. The input variables are commonly denoted with $X_i$, in example $X_1$ is the TV spend, $X_2$ the radio spend and $X_3$ the newspaper spend. The name for input variables has become inconsistent as the the terms predictor, independent variables and features can be used interchangeably. The output variable, in this example the sales, is also called the response or dependant variable and denoted with Y.
+    Ideas are sometimes best conveyed through example. \cite{hasite} illustrated the benefits of statistical learning on a simple yet illustrative example. In the example we assume the be working for as statistical consultant in charge of advising a client on how to improve the sales of a given product. The client provides us with a data set containing the sales of a given product across several markets along with the budged for the product in each market in three different media outlets: TV, radio and newspaper. The client is not able to directly impact the amount of sales but he may to change amount spend on each media outlet. If we can understand the number of items sold as a function of spend on media we can suggest our client to adjust spending to increase units sold. In \ref{fig:sales} the sales are plotted on the Y axis and the budget for a media outlet on the X axis. \cite{hastie} uses this example to introduce terminology as well as the framework. The media budgets are the input variable and sales are the output variables. The input variables are commonly denoted with $X_i$, in example $X_1$ is the TV spend, $X_2$ the radio spend and $X_3$ the newspaper spend. The name for input variables has become inconsistent as the the terms predictor, independent variables and features can be used interchangeably. The output variable, in this example the sales, is also called the response or dependant variable and denoted with Y.
     
         \begin{figure}
             \centering
@@ -297,17 +300,17 @@
         The reducible error, also called residual error is the difference between the model matrix multiplies with the estimated $\beta$ minus the value for y. $\|r\|^2 = \|y-X \widehat{\beta\x}\|^2$. 
         
     \subsubsection{Influence Matrix}
-    The influence matrix or hat matrix is required for the prediction piece of linear models and plays an important role for generalized additive models. \cite{gamBook} introduces the influence matrix as the matrix that yields the predicted fitted value vector $\widehat{\mu}$. To obtain  $\widehat{\mu} $the hat matrix is post multiplied with the data vector $y$. The influence matrix is required to compute the estimated value vector. The first p columns of Q make up the matrix $Q_f$. $f$ is then defined as $f = Q_f y$ which implies that 
+    The hat or influence matrix is the projection matrix that maps the $y$ vector into the column space of $X$. Given a design matrix $X$ with n rows and p columns and $n > p$. The $y$ vector cannot lie in the column space of X. The hat matrix is the projection of $y$ into the column space of $X$. Since the projection is an approximation the matrix is called hat matrix. The hat matrix is required for the prediction piece of linear models and plays an important role for generalized additive models. \cite{gamBook} introduces the influence matrix as the matrix that yields the predicted fitted value vector $\widehat{\mu}$. To obtain $\widehat{\mu} $the hat matrix is post multiplied with the data vector $y$. The influence matrix is required to compute the estimated value vector. The first p columns of Q make up the matrix $Q_f$. $f$ is then defined as $f = Q_f y$ which implies that 
     
     \begin{equation}
-        \widehat{\beta} = R^-1 Q_f^T y 
+        \widehat{\beta} = R^{-1} Q_f^T y 
     \end{equation}
     
     Given that $\widehat{\mu} = X \widehat{\beta}$ and $X = Q_fR$ the fitted value vector can be written as 
     \begin{equation}
         \widehat{\mu} = Q_f RR^-1 y = Q_fQ_f^T_f y  
     \end{equation}
-    Since the upper triangular matrix $R$ is multiplied its inverse we can factor them out resulting with the hat matrix $A \equiv Q_f Q_f^T$ that fulfills $\widehat{\mu} = Ay$.
+    Since the upper triangular matrix $R$ is multiplied its inverse we can factor them out resulting with the hat matrix $A \equiv Q_f Q_f^T$ that fulfills $\widehat{\mu} = Ay$.  The hat matrix will essential in cross validating the estimated $\widehat{y}$ values. Generalized additive models will iteratively minimize the distance difference between the $\widehat{y}$ and $y$ . Details will be given in later sections.
     
     \subsubsection{Simple linear model example}
         
@@ -478,7 +481,7 @@
         \subsubsection{Generalized Linear Model Example}
     
     \section{Generalized Additive Models}
-    Generalized additive model (GAM) allow predictor variables of GLM to be estimated with non-parametric methods. GAM has the interpretability advantages of GLMs where the contribution of each predictor variable to the function is clearly encoded. However, it has substantially more flexibility because the relationships between predictor and response variable are not assumed to be linear. GAMs assume the relationship between predictor in response variable to be the sum of functions. These functions are regularized by enforcing a smooth patter. These smooth functions can be estimated with a scatter plot smoother. \cite{gam} introduced GAMs in 1990 and described many approaches to scatter plot smoothing. For practicability and applicability this thesis will focus on regression splines, especially cubic splines and cyclic cubic splines. \cite{gamBook} formally describe GAMs as:
+    Generalized additive model (GAM) allow predictor variables of GLM to be estimated with non-parametric methods. GAM has the interpretability advantages of GLMs where the contribution of each predictor variable to the function is clearly encoded. However, it has substantially more flexibility because the relationships between predictor and response variable are not assumed to be linear. GAMs assume the relationship between predictor in response variable to be the sum of functions. These functions are regularized by enforcing a smooth patter. These smooth functions can be estimated with a scatter plot smoother. \cite{gam} introduced GAMs and described many approaches to scatter plot smoothing. For practicability and applicability this thesis will focus on regression splines, especially cubic splines and cyclic cubic splines. \cite{gamBook} formally describe GAMs as:
     
     \begin{equation}
         g(\mu_i) = X_i^* \theta + f_1(x_1i) + f_2(x_2i) + ... + f_3(x_3i)
@@ -486,33 +489,267 @@
     
     GAM inherit the link function $g()$, parameter vector $\theta$ and the model matrix $X_i^*$ from the GLM. Following the GLM definition $\mu \equiv E(Y_i)$ and $Y$ is some exponential family distribution. $X_i^*$ is the ith row of the model matrix. GAM introduce smooth functions $f_j$ over the the predictor variables $x_k$. Specifying a model in terms of an non-parametric, smooth functions allow $x_k$ to have an arbitrary pattern. Allowing $f_j(x_k)$ to follow any shape can give insight into response variable behavior that the parametric form GLMs fail to capture. The gained flexibility comes with the question of how to find these smooth functions.
     
-    \subsection{Smooth functions estimation with regression splines}
+    \subsection{Smooth functions}
     Smooth functions are any function that explains $x_i$ in terms of $y_i$ with some error $\epsilon$. The error term  is a random variable that is independent, identically distributed with $N(0, \sigma^2)$. This is identical to the definition of non-parametric methods from the first section of this thesis. Formally we are searching for function $f()$ that satisfies:
     
     \begin{equation}
         y_i = f(x_i) + \epsilon_i
     \end{equation}
     
-    Bootstraping the methods used for fitting a simple linear model we assume the the function $f$ to be linear in $x_i$. This assumption is guarantees that the function can be found with linear parametric methods. \cite{gamBook}
-            
-            \subsubsection{Regression Splines}
-            \subsubsection{Basis Functions}
-            Haar form
-            \subsubsection{Cubic Regression Splines}
-            Haar form for b=4
-            \subsubsection{Cyclic Cubic Regression Splines}
-        \subsubsection{Fitting Generalized Additive Models}
-        \subsection{Penalized Iterative Reweighted Least Squares}
-        \subsection{Generalized Additive Model Example}
+    Bootstraping the methods used for fitting a simple linear model we assume the the function $f$ to be linear in $x_i$. This assumption is guarantees that the function can be found with linear parametric methods. \cite{gamBook} proposes to choose a basis function to represent function $f$. The basis function allows to represent the function $f$ as a combination of a basis function and a parameter vector $\beta$. The function $f$ can thus be written as:
     
-    \section{Numerical Optimizations For Large Data Sets}
+    \begin{equation}
+        f(x) = \sum_{i=1}^{q} b_i(x)\beta_i
+    \end{equation}
+
+    The function is $f$ is represented as the sum of basis functions times the parameter vector. The sum goes up the basis dimension which is determined by the basis. The influence of the $\beta$ is linear combination, satisfying the linearity condition.\cite{hastie} states that the basis over the entire range of the data would amount to a polynomial regression. Polynomial regression can be useful but suffer from instability at the edges and insufficient for interpolation. The suitable alternative is splines estimation. Splines divide the the unknown function into sections. Each section is then fit with an individual polynomial. Each piecewise polynomial is required to be continuous at the intersection with the adjacent piecewise polynomial. Basis splines find the piecewise polynomial through a linear combination of function basis and parameters $\beta$. This approach gives enough flexibility while satisfying the linearity constraint.
+    
+    \subsection{Basis Splines}
+    Splines constitute an ideal method for the nonparametric estimation of any unknown function. Basis splines (B-Splines) are of particular interest since they are very easy to set up satisfy in the linearity condition. Their linear nature allows to fit them via the simple model from sections 1. B-Splines consists of two parts: the knots and the functions. A B-spline of order n is a piecewise polynomial function of degree $< n$ in a variable x. Each polynomial is of degree $<n$ \cite{splines} states that B-splines are defined by their order m and number of interior knots N. There are two endpoints which are themselves knots so the total number of knots will be $N + 2$ . The degree of the B-spline polynomial will be the spline order m minus one. The degree n of a B-Splines is thus $m-1$. The knots are formally described as a vector in non-descending order with N interior knots and knots at the endpoints.
+    
+    \begin{equation}
+        t_0 \leq  t_1 \leq ..  t_N \leq t_N+1
+    \end{equation}
+    
+    The location and the number of knots are a matter of design and impact the resulting basis function. The B-Spline function is unique for any given sequence of knots. The B-Spline function is the $b()$ of the previous section. \cite{hastie01statisticallearning} states that for the basis function given a sequence of knots and x values can be given in the Haar form. The Haar form allows for a short, recursive definition of the basis function. 
+    
+    \begin{equation}
+        b_{i,1}(x) := \begin{cases}
+ & 1 \text{ if } t_i \leq x \leq t_i+1 \\ 
+    & 0 \text{ otherwise}\\ 
+        \end{cases}
+    \end{equation}
+    
+    \begin{equation}
+           b_{i,k}(x) := \frac{x-t_i}{t_{i+k-1} - t_i} b_{i,k-1}(x) + \frac{t_{i+k}-x}{t_{i+k}-t_{i+1}}b_{i+1,k-1}(x)
+           \label{haar}
+    \end{equation}
+            
+    The B-Spline basis is strictly local function. For a given basis order of m+2 the basis function is only non-zero between the m+3 knots. Each basis function is only non-zero over the intervals between m+3 adjacent knots. \cite{regressionspline} provides an insightful example of a B-Spline. B-Splines cover a broad range of basis functions and offer flexibility. Specifying an order for the basis am
+            
+            
+    \begin{figure}
+            \centering
+            \includegraphics[width=\textwidth]{bsplines}
+            \caption{\cite{regressionspline} gives a visual example of a basis spline.}
+            \label{fig:bsplines}
+    \end{figure}
+    
+    The figure on the left is the basis for the given x values and the amended knots. The figure on the right is the resulting B-Spline.
+    
+    \subsubsection{Fitting Cubic Splines}
+    A cubic basis is a reasonable choice for a B-Spline. Cubic splines B-Splines of order 4 with the additional condition that the first and second derivative are equal at the knot location. \cite{gamBook} illustrates the process of fitting a cubic spline to a data set with the predictor variable $x$ and response $y$. For this example the author chooses a specific cubic splines basis called rk. The function rk defines a cubic cyclic basis given a vector of values x and the relevant knots xk. The basis a possible cubic spline choice and introduced by \cite{gamBook}. With the function rk the model matrix to find a cubic spline can be written.  
+    The function spl.X sets up the model matrix to fit a cubic spline. The function takes the data vector x and knot vector xk to produce the full model matrix. 
+    <<>>=
+    rk<-function(x,z) # R(x,z) for cubic spline on [0,1] 
+    { ((z-0.5)^2-1/12)*((x-0.5)^2-1/12)/4-
+    ((abs(x-z)-0.5)^4-(abs(x-z)-0.5)^2/2+7/240)/24
+    }
+    @
+     <<>>=
+     spl.X<-function(x,xk)
+            # set up model matrix for cubic penalized regression spline    
+        {   q<-length(xk)+2             # number of parameters
+            n<-length(x)                # number of data
+            X<-matrix(1,n,q)            # initialized model matrix
+            X[,2]<-x                    # set second column to x
+            X[,3:q]<-outer(x,xk,FUN=rk) # and remaining to R(x,xk) X
+        }
+     @
+     
+     The rows of the model matrix are determined by the number of elements in the data vector x. The first two columns of the model matrix are for encoding and of less interest for the thesis. The remaining elements of the model matrix are computing through the basis function rk. Given that the splines were designed to be linear in the unknown parameter $\beta$ the splines can be estimated with the methods introduced in section 1. The ability to fit an arbitrary function by defining the basis and solving the resulting matrix with a linear method is a key aspect of regression splines. To fit the spline we estimate the coefficients from the model matrix with a linear model. The exact fitting happens via the QR Decomposition described in section 1. The estimated coefficients get multiplied by the same design matrix that produced the coefficients to estimates fitted values. This process essentially fits the function to the data that was used to estimate the coefficients. 
+     
+     <<>>=
+        
+        size<-c(1.42,1.58,1.78,1.99,1.99,1.99,2.13,2.13,2.13, 2.32,2.32,2.32,2.32,2.32,2.43,2.43,2.78,2.98,2.98) 
+        wear<-c(4.0,4.2,2.5,2.6,2.8,2.4,3.2,2.4,2.6,4.8,2.9, 3.8,3.0,2.7,3.1,3.3,3.0,2.8,1.7) 
+        x<-size-min(size)
+        x<-x/max(x)
+        plot(x,wear,xlab="Scaled engine size",ylab="Wear index")
+        xk<-1:4/5 # choose some knots 
+        X<-spl.X(x,xk) # generate model matrix 
+        mod.1<-lm(wear~X-1) # fit model with out the first column
+        xp<-0:100/100 # x values for prediction 
+        Xp<-spl.X(xp,xk) # prediction matrix 
+        lines(xp,Xp%*%coef(mod.1)) # plot fitted spline
+     @
+    
+    The resulting plot gives a good idea of the estimated method $f()$. The choice of basis dimensions, $q = knots+2$ was arbitrary but highly influential for the function $f()$. The next section introduces theory to justify the choice of basis dimension and a way of penalizing over fit of the data.
+    \subsubsection{Penalized Cubic Splines}
+    
+    Smoothing cubic splines seek to find the smoothest interpolating spline by penalizing the 'wigglynes". \cite{gamBook} argues that the choice of spline basis order does not suffice to control the smoothness of the resulting spline. The author goes on to introduce the penalized regression spline, specifically the penalized cubic spline. Penalized cubic splines introduce a smoothing parameter that penalizes the over-fitting of data. Over-fitting has been stated as a major weakness of non-parametric methods in chapter one, the penalized regression spline is a compromise. As stated the subject of fitting a function is to find a parameter vector $\beta$ that minimizes the following equation.
+    
+    \begin{equation}
+        \left \| y- X\beta \right \| ^2
+    \end{equation}
+    
+    To penalize an hectic function \cite{gamBook} introduce as penalty term $\lambda$. The penalty term $\lambda$ weights the second derivation of the estimated function $f()$. Broadly speaking the second derivative of a function represents the acceleration or the mentioned "wigglyness" of function. With the penalty term the new subject of estimation becomes:
+    
+    \begin{equation}
+        \left \| y- X\beta \right \| ^2 + \lambda\int_{0}^{1} (f^{''}(x))^2) dx
+    \end{equation}
+    
+    The trade-off between fitting all x values and a smooth function is controlled by the penalty term $\lambda$. Since the penalty term weights the smoothness criteria it is also called smoothing parameter. The choice of $\lambda$ is crucial to the resulting function. While a $\lambda$ of 0 creates a function that will directly pass each x data point. A high lambda value will over penalize each acceleration of the function $f$ and generate a straight line. Since the estimated function $f$ is linear in $\beta$ the subject of estimation can be rewritten as:
+    
+    \begin{equation}
+        \left \| y- X\beta \right \| ^2 + \lambda \beta^T S \beta
+    \end{equation}
+    
+    Tha matrix $S$ is a penalty matrix that is specific to the chosen basis. The penalty matrix is a diagonal matrix with the penalty values adjacent to the to be penalized term. The problem of estimating the penalized regression spline is to minimize the just stated equation with respect to $\beta$ and to estimate $\lambda$. Estimating $\lambda$ will be discussed in the next section. For computationally stable fitting of regression splines the above formula can be rewritten as the following:
+    
+    \begin{equation}
+        \label{penalty}
+        \left \| y- X\beta \right \| ^2 + \lambda \beta^T S \beta = \left\|  \begin{bmatrix} y\\ 0
+\end{bmatrix} - \begin{bmatrix} X\\ \sqrt{\lambda} B \end{bmatrix} \beta \right\| ^2
+    \end{equation}
+    
+    \cite{gamBook} states the the penalty matrix $S$ for a given basis can be written as its square root $B$. Any symetric matrix can be decomposed into the following form. $B = \sqrt{S}$. The model matrix $X$ has been augmented with the square root of the penalty matrix S time the square root of $\lambda$. Since the X matrix gets augmented the vector of $y$ values needs to be agumented as well. Since we still are using linear models the number of elements in the $y$ vector must match the number of rows in the augmented $X$ matrix. A simple square root of a matrix can be written as
+    
+    <<>>=
+     mat.sqrt<-function(S) # A simple matrix square root 
+     {  d<-eigen(S,symmetric=TRUE)
+        rS<-d$vectors%*%diag(d$values^0.5)%*%t(d$vectors)
+     }
+    @
+    
+    The penalty matrix is specific to each basis function. For the author's choice of the rk basis the matrix S is can be created by forming outer knot product with the basis rk. The resulting matrix $S$ is the specific penalty matrix for a vectors of knots and a basis.
+     
+    <<>>=
+    spl.S<-function(xk)
+    # set up the penalized regression spline penalty matrix,
+    # given knot sequence xk
+    {   q<-length(xk)+2
+        S<-matrix(0,q,q)                # initialize matrix to 0
+        S[3:q,3:q]<-outer(xk,xk,FUN=rk) # fill in non-zero part
+        S 
+    }
+    @
+    
+    With function for the model matrix X, the penalty matrix S and the ability to take a square root of a matrix a penalized cubic spline can be found by constructing the full matrix according to \ref{penalty}. 
+    <<>>=
+    prs.fit<-function(y,x,x_knots,lambda)
+    # function to fit penalized regression spline to x,y data, 
+    # with knots x_knots, given smoothing parameter, lambda.
+    {   q<-length(x_knots)+2                # dimension of basis 
+        n<-length(x)                        # number of data
+        # create augmented model matrix
+        Xa <- rbind(spl.X(x,x_knots),mat.sqrt(spl.S(x_knots))*sqrt(lambda)) 
+        y[(n+1):(n+q)]<-0               # augment the data vector
+        lm(y ~ Xa-1)                    # fit penalized regression spline with a linear model
+    }
+    @
+    
+    The prs.Fit functiion estimated a penalized regression spline for a given vector $y$ of response variables, a vector $x$ of predictor variables, a choice of knots $x_knots$ and a given smoothing parameter $\lambda$. The method then forms $X$, $B$, $y$ and $\sqrt{\lambda}$ according to \ref{penalty}. The formed system of equation gets solved via the linear model. The resulting estimated model contains the estimated coefficients. The proposed function can be used to estimated a penalized regression spline for the wear data set.
+    
+    <<>>=
+    x_knots <-1:7/8 # choose some knots 
+    lambda <- 0.0001
+    mod.2 <- prs.fit(wear,x,x_knots, lambda) # fit pen. reg. spline 
+    Xp<-spl.X(xp,x_knots) # matrix to map params to fitted values at xp 
+    plot(x,wear);lines(xp,Xp%*%coef(mod.2)) # plot data & spl. fit
+    @
+    
+    From the function prs.fit and \ref{penalty} it should be become evident that the choice of $\lambda$ has a significant influence on the shape of $f$. The figure below illustrates the influence of $\lambda$ on the shape of $f$
+    
+    
+    \begin{figure}
+            \centering
+            \includegraphics[width=\textwidth]{lambda}
+            \caption{\cite{gamBook} states the influence of $\lambda$ on the resulting function $f$.}
+            \label{fig:lambda}
+        \end{figure}
+    
+    \cite{gamBook} states that influence of $\lambda$ is significant enough that it should be estimated individually. How to estimate $\lambda$ is discussed in the next section.
+    
+    \subsubsection{Smoothing Parameter Estimation}
+    The previous section and figure \ref{fig:lambda} in particular illustrated the importance of the smoothing parameter $\lambda$. A high value for $\lambda$ will cause an over smoothing while a low value will under smooth the data. Too high or too low, a bad choice for $\lambda$ will result in a spline $\widehat{f}$ that is far from the original unknown function $f$. An ideal $\lambda$ would have a small distance between $f$ and $\widehat{f}$ A measure $M$ is defined to capture this notion.
+    
+    \begin{equation}
+        M = \frac{1}{n} \sum_{i=1}^{n} (\widehat{f}_i - f_i)^2
+    \end{equation}
+    
+    \cite{gamBook} uses the following notation for the following equations. $\widehat{f}_i \equiv \widehat{f}(x_i)$ and  $f_i \equiv f(x_i)$. A suitable criterion to estimate $\lambda$ is thus to minimize $M$. However, since the true function $f$ is known $M$ cannot be estimated but it is possible to estimate the squared error $E(M)+\sigma^2$. \cite{gamBook} proposes to find $\lambda$ through cross validation. Given $\widehat{f}^{-i}$ is the estimated function on all data except $y_i$ a ordinary cross validation can given as:
+    
+    \begin{equation}
+        V_o = \frac{1}{n} \sum_{i=1}^{n} (\widehat{f}^{-i} - y_i)^2
+    \end{equation}
+    
+    This score results from leaving out each datum in turn, fitting the model to the remaining data and calculating the squared difference between the missing datum and its predicted value: these squared differences are then averaged over all the data. It should be obvious that the process of refitting the function for each $y$ value is $O(n^2)$. \cite{gamBook} states that the ordinary cross validation score can be defined in terms of the influence matrix.
+    
+    \begin{equation}
+        V_o = \frac{1}{n} \sum_{i=1}^{n} (y_i -\widehat{f}_i)^2 /(1-A_{ii})^2
+    \end{equation}
+    
+    The author thus proposes the generalized cross validation score (gcv) to avoid the computational over head. Computing the cross validation score through the hat matrix allows to validate without forming each possible function for each $y$ value. The computational most stable version of the gcv score replaces the weights $1-A_{ii}$ by the mean weight $tr(I-A)/n$. For a detailed discussion of the gcv see \cite{wahba}. 
+    
+    \begin{equation}
+        V_g = \frac{n \sum_{i=1}^{n} (y_i - \widehat{f}_i )^2}{tr(I-A)^2} 
+    \end{equation}
+    
+    This section will use this definition to compute the gcv score for a given function and the given hat matrix. With this the definition a simple loop can be written to find the best possible $\lambda$. The model producing the smallest gcv score generates the smoothest possible cubic spline for the given data set.
+    <<>>=
+    lambda<-1e-8
+    n<-length(wear)
+    V<-0
+    for (i in 1:60) # loop through smoothing parameters 
+        { 
+            mod<-prs.fit(wear,x,xk,lambda)          # fit model, given lambda
+            trA<-sum(influence(mod)$hat[1:n])       # find tr(A) 
+            rss<-sum((wear-fitted(mod)[1:n])^2)     # residual sum of squares 
+            V[i]<-n*rss/(n-trA)^2                   # obtain GCV score 
+            lambda<-lambda*1.5                      # increase lambda
+        }
+    plot(1:60,V,type="l",main="GCV score",xlab="i")     # plot score
+    i<-(1:60)[V==min(V)]                             # extract index of min(V) 
+    mod.3<-prs.fit(wear,x,xk,1.5^(i-1)*1e-8) # fit optimal model 
+    Xp<-spl.X(xp,xk) # .... and plot it
+    plot(x,wear)
+    lines(xp,Xp%*%coef(mod.3))
+    @
+    
+    This section introduced the gcv score as a measure to evaluate the fit of a penalized regression spline. The gcv score is the central metric in evaluating choices for $\lambda$ and will be used the the following sections to evaluate generalized additive models.
+    
+    \subsection{Additive Model}
+    The discussed methods allow to fit a regression spline to a single variable. Almost all relevant model have more than one variable. The additive model allows to model the response as the sum of several predictors. \cite{gamBook} formally describes the additive model as:
+    
+    \begin{equation}
+        y_i = f_1(x_i) + f_2(z_i) + \epsilon_i
+    \end{equation}
+    
+    The  functions $f_j$ are smooth functions estima
+    
+    \subsection{Generalized Additive Model}
+    \subsubsection{Penalized Iterative Reweighted Least Squares}
+    \subsubsection{Generalized Additive Model Example}
+    
+    
     
     \section{Apache Spark}
         \subsection{General In Memory Cluster Computing Framework}
         \subsection{The Language Scala and Breeze}
         \subsection{Machine Learning Pipeline}
+        \subsubsection{Transformer}
+        \subsubsection{Estimator}
+        \subsection{Implementing GAM in Apache Spark}
+        \subsubsection{Architecture}
+        
+        
+
+    \section{Experiment: Fitting GAMs for large data sets}
+    \subsection{Fitting a large gam with Airbnb data}
+        \subsubsection{Why GAMs for Airbnb}
+        \subsubsection{Fitting seasonality with GAMs}
+    \subsection{How does the performance compare to mgcv?}
+        \subsubsection{Memory}
+        \subsubsection{CPU}
+    \subsection{How does the performance scale?}
+        \subsubsection{Memory}
+        \subsubsection{CPU}
     
-    \subsection{Implementing Generalized Additive Models in Apache Spark}
+    \section{Conclusion}
+    \subsection{Future Work}
+    
+    
     
     \section{Matrix Algebra Appendix}
         \subsection{QR Decomposition}
