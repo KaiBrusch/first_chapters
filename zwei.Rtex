@@ -53,9 +53,9 @@
 
     \paragraph{Contact} \texttt{kai.brusch@gmail.com}
 
-    \paragraph{Location} Hochschule für Angewandte Wissenschaften Hamburg
+    \paragraph{Location} Hochschule f\"ur Angewandte Wissenschaften Hamburg
     \paragraph{Department} Dept. Informatik
-    \paragraph{Examiner} Prof. Dr. Michael Köhler-Bußmeier
+    \paragraph{Examiner} Prof. Dr. Michael K\"ohler-Bu\ss{}meier
     \paragraph{Second examiner} Dipl.-Mathematiker Univ. Markus Schmaus
 
     \newpage
@@ -140,47 +140,22 @@
     R is a free software environment for statistical computing and graphics. R is designed to express statistical models and comes with an development environment that is build to illustrate and discover data. Academia has recognized R as it's language and continuously published learning material and research alongside R code. \cite{hastie} and \cite{gamBook} employ R to illustrate statistical concepts in a computational environment. I will do the same and use R to express statistical concepts and example throughout this thesis. I will now introduce some syntax for matrix manipulation in R:
     
   <<chunk1>>=
-    # A vector is the essential data type in R, R uses row vectors
-    vector = c(1,2,3,4)
+    # A vector is the essential data type in R
+    y = c(1,2,3,4,5)
     
     # Indexes start at 1
-    vector[1]
+    y[1]
     
     # Create a matrix with n rows m columns filled with random values
     n = 5
     m = 3
     X = matrix(runif(15),n,m)
-
-    # Display the generated matrix
-    X
-    # Transpose the matrix
-    t(X)
     
-    # Multiply a matrix with its transpose
-    X %*% t(X)
+    # A linear model to explain y in terms of X
+    mod <- lm(y ~ X)
     
-    # Basic Indexing
-    X[1,2]
-    
-    # Extract subset of a matrix
-    X[1:3]
-    
-    # Assign values to subset of a matrix
-    X[1:3] = 2
-    X
-    
-    # Extract column of a matrix, implicit conversion to a row vector
-    X[,2]
-    
-    # Assign values to a column of a matrix
-    X[,2] = 5
-    X
-    
-    # Add a column to a matrix
-    cbind(X,c(1,2,3,4,5))
-    
-    # Add a row to a matrix
-    rbind(X,c(1,2,3))
+    # Return the coefficients of the model
+    coef(mod)
     @
         
     
@@ -540,7 +515,7 @@
     \subsubsection{Fitting Cubic Splines}
     A cubic basis is a reasonable choice for a B-Spline. Cubic splines B-Splines of order 4 with the additional condition that the first and second derivative are equal at the knot location. \cite{gamBook} illustrates the process of fitting a cubic spline to a data set with the predictor variable $x$ and response $y$. For this example the author chooses a specific cubic splines basis called rk. The function rk defines a cubic cyclic basis given a vector of values x and the relevant knots xk. The basis a possible cubic spline choice and introduced by \cite{gamBook}. With the function rk the model matrix to find a cubic spline can be written.  
     The function spl.X sets up the model matrix to fit a cubic spline. The function takes the data vector x and knot vector xk to produce the full model matrix. 
-    <<>>=
+    <<echo=FALSE, cache=TRUE>>=
     rk<-function(x,z) # R(x,z) for cubic spline on [0,1] 
     { ((z-0.5)^2-1/12)*((x-0.5)^2-1/12)/4-
     ((abs(x-z)-0.5)^4-(abs(x-z)-0.5)^2/2+7/240)/24
@@ -605,7 +580,7 @@
     
     \cite{gamBook} states the the penalty matrix $S$ for a given basis can be written as its square root $B$. Any symetric matrix can be decomposed into the following form. $B = \sqrt{S}$. The model matrix $X$ has been augmented with the square root of the penalty matrix S time the square root of $\lambda$. Since the X matrix gets augmented the vector of $y$ values needs to be agumented as well. Since we still are using linear models the number of elements in the $y$ vector must match the number of rows in the augmented $X$ matrix. A simple square root of a matrix can be written as
     
-    <<>>=
+    <<echo=FALSE, cache=TRUE>>=
      mat.sqrt<-function(S) # A simple matrix square root 
      {  d<-eigen(S,symmetric=TRUE)
         rS<-d$vectors%*%diag(d$values^0.5)%*%t(d$vectors)
@@ -805,14 +780,102 @@
     best$sp # GCV best smoothing parameter 
     @
     
-    If the best 
+    The resulting smoothing parameter for Girth is fairly presumably allowing $f_1$ some curvature. Height has a very high smoothing parameter, this most likely results in a rather straight line.  he values of the smooths at the predictor variable values can be obtained quite easily by zeroing all model coefficients, except those corresponding to the term of interest, and using predict as the following code shows.
+
     
+    <<echo=FALSE, cache=TRUE>>=
     
+    # plot 
+    plot(trees$Volume,fitted(best$model)[1:31],
+        xlab="Fitted Volume",ylab="Actual Volume") 
+    b<-best$model
+    b$coefficients[1]<-0 # zero the intercept 
+    b$coefficients[11:19]<-0 # zero the second smooth coefs 
+    f0<-predict(b) # predict f_1 only, at data values 
+    plot(trees$Girth,f0[1:31],xlab="Scaled Girth",
+     ylab=expression(hat(f[1])))
+
+    @
+    
+    The resulting plot confirms the observation that the Girth smooth has more curvature than the Height smooth. The middle figure is the estimate of the smooth function of Girth at the given Girth data. The right figure is the estimate of the smooth function of Height at the given Height data. 
    
     \subsection{Generalized Additive Model}
-    \subsubsection{Penalized Iterative Reweighted Least Squares}
-    \subsubsection{Generalized Additive Model Example}
+    Generalized additive models (GAMs) follow from additive models, as generalized linear models follow from linear models. Like the GLM the GAM predicts some known smooth monotonic function of the expected value of the response. The response following any exponential family distribution. For the sake of illustrating the similarities to a GLM the function fit.am can extended to account for a gamma error and log link function.  
     
+    <<>>==
+    fit.gamG<-function(y,X,S,sp)
+        # function to fit simple 2 term generalized additive model 
+        # Gamma errors and log link
+        { # get sqrt of combined penalty matrix
+            rS <- mat.sqrt(sp[1]*S[[1]]+sp[2]*S[[2]])
+            q <- ncol(X) # number of parameterss
+            n <- nrow(X) # number of data
+            X1 <- rbind(X,rS) # augmented model matrix
+            b <- rep(0,q);b[1] <- 1 # initialize parameters
+            norm <- 0;old.norm <- 1 # initialize convergence control 
+            while (abs(norm-old.norm)>1e-4*norm) # repeat unconverged
+            { eta <- (X1%*%b)[1:n] # generate pseudo data by computing expected value of current beta choice
+                mu <- exp(eta) # log link, exp of pseudo data
+                z <- (y-mu)/mu + eta  # compute pseudo data
+                z[(n+1):(n+q)] <- 0 # agument pseudo data
+                m <- lm(z~X1-1) # solve the linear model with pseudo data
+            }
+        list(model=m,gcv=norm*n/(n-trA)^2,sp=sp)
+        }
+    @
+    
+    The function fit.gamG takes a model matrix X and a list of penalty matricies S. Both can be generated by the am.setup function. The generalized additive model seeks the best smoothing parameter by iteratively searching for a value until convergence. Each iteration step forms a vector of pseudo data. Pseudo data is the estimated values trained data. If the resulting gcv score of the current pseudo data does not change the model is converged. The fitting process is called penalized iterative reweighted least squares and formally described in the next section.
+    
+    
+    
+    
+    \subsubsection{Penalized Iterative Reweighted Least Squares}
+    While the GLM is fitted by the iterative reweighted least squares GAMs are fitted by the penalized reweighted least squares. The major difference being that the objective is contains the penalty matrix. To fit a generalized additive model the following penalized iteratively re-weighted least squares (P-IRLS) scheme is iterated to convergence.
+    
+    \begin{enumerate}
+    \item Given the current parameter estimated $\beta^{[k]}$ and the estimated mean response vector $\mu^{[k]}$ compute 
+    \begin{equation}
+        w \propto \frac{1}{V(\mu_i^{[k]}) g^{'}(\mu_i^{[k]})}
+    \end{equation}
+        
+    With the pseudo data vector $z_i= g(\mu_i^{[k]})(y_i-\mu_i^{[k]}) + X_i \beta^{[k]}$ and the $var(Y_i) = V(\mu^{[k]}) \theta$ as described in the IRLS section.
+    
+    \item Minimize the resulting least squares objective 
+    
+    \begin{equation}
+    \left \|  \begin{bmatrix} \sqrt{W} & 0 \\ 0 & I \end{bmatrix} \left ( \begin{bmatrix} z\\0 \end{bmatrix} -  \begin{bmatrix} X \\ B \end{bmatrix} \right  \beta)\right \| ^2 \end{equation}
+    
+    Minimizing the least squares objective w.r.t. $\beta$ to obtain $\beta^{[k+1]}$. B is again any square root matrix such that $B^TB = \lambda_1 S_1 +\lambda_2 S_2$
+    
+    \end{enumrate}
+
+    The P-IRLS accounts for the penalty matrix required to fit additive models with smoothing functions.
+    
+    \subsubsection{Generalized Additive Model Example}
+    Fitting a GAM with the fit.gamG function we can see a slightly better fit than th
+    
+    <<echo=FALSE, cache=TRUE>>=
+    sp<-c(0,0) # initialize smoothing parameter (s.p.) array 
+    for (i in 1:30) for (j in 1:30) # loop over s.p. grid
+    { 
+        sp[1]<-1e-5*2^(i-1);sp[2]<-1e-5*2^(j-1)     # s.p.s 
+        b<-fit.gamG(trees$Volume,am0$X,am0$S,sp)      # fit using s.p.s.
+        if (i+j==2) best<-b else                    # number of data
+        if (b$gcv<best$gcv) best<-b                 # augmented X
+    }
+    best$sp # GCV best smoothing parameter 
+    
+    # plot 
+    plot(trees$Volume,fitted(best$model)[1:31],
+        xlab="Fitted Volume",ylab="Actual Volume") 
+    b<-best$model
+    b$coefficients[1]<-0 # zero the intercept 
+    b$coefficients[11:19]<-0 # zero the second smooth coefs 
+    f0<-predict(b) # predict f_1 only, at data values 
+    plot(trees$Girth,f0[1:31],xlab="Scaled Girth",
+     ylab=expression(hat(f[1])))
+
+    @
     
     
     \section{Apache Spark}
