@@ -15,6 +15,8 @@
 \usepackage{textgreek}
 \usepackage{listings}
 \usepackage{graphicx}
+\usepackage{epigraph}
+
 \usepackage[]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[margin=1.3in]{geometry}
@@ -64,27 +66,40 @@
 
     \newpage
 
+    \section{Introduction} \label{introduction}
     
-        \section{Statistical Learning}
     
-     \cite{hastie} introduces statistical learning as a set of tools for modeling and understanding complex data sets. Recent developments in statistics and computer science have created an interesting field that empowers modern statistical with powerful computational methods. Statistical learning provides a powerful framework to ask and answer interesting questions with data. This thesis will focus on the generalized additive model, a method of the supervised learning branch of statistical learning. Supervised learning methods build a statistical model for predictions and estimations of an output variable based on one or many input variables. Statistical learning methods are essential for modern scientific research and have empowered many other branches of quantitative sciences. The professional world has been raving about the potential of statistical learning giving birth terms such as: Data Science and Big Data.
+    \epigraph{Statistics is the the grammar of science}{\textit{Karl Pearson}}
+
+    Karl Pearson, the father of applied statistics famously described statistics as the grammar of science. Leveraging data as a method of inquiry has become the maxim of modern scientific thought. Hypothesis testing, statistical modeling and measurement are areas in which statistics are essential to every quantitative science. "The coming century is surely the century of data" David Donoho recognizes the 21th century as the century of data and statistics. The ever growing ability to store and process data has facilitated a quantum leap in science, technology and business. Consumer electronics and the modern Internet have generated more data in the past two years than in the prior 2000 years. Modern statistics has developed sophisticated models to discover and explain hidden patterns in data. The glut of data and the complexity of statistical models have placed the computer at the heart of statistics. Advances in computing have bridged the gap between large data sets and statistical inquiry. Cloud computing frameworks allow statistical models to process gigabytes of data. This thesis focuses on a statistical model called generalized additive model ("GAM"). \cite{gam} describes the GAM as the compromise of interpretable and flexible models. The GAM provides the interpretability of traditional linear models but allows for flexible estimation of some variables. 
     
-        \subsection{Why statistical learning?}
+    GAMs and much of modern statistical research is published in the programming language R. \cite{gamBook} implemented an optimized version of the GAM in an R packaged called Mixed GAM computation Vehicle ("mgcv"). R was written by statisticians and is the lingua fracta for statistical research. However, R is not designed for parallelization and cluster computing. Apache Spark ("Spark") has emerged as the most prominent general purpose cluster computing frame work. The ability to perform distributed, in-memory computation while preserving a high level of abstraction makes Spark a popular cluster computing framework. The distributed nature of Spark allows the performance of iterative operations on large data sets while maintaining the data in-memory. Spark appears to be an ideal computation environment for GAMs, because GAMs are estimated by a highly iterative process. Exploring the advantages of using Spark rather than R for GAM estimation is the goal of this thesis. 
     
-    Ideas are sometimes best conveyed through example. \cite{hasite} illustrated the benefits of statistical learning on a simple yet illustrative example. In the example we assume the be working for as statistical consultant in charge of advising a client on how to improve the sales of a given product. The client provides us with a data set containing the sales of a given product across several markets along with the budged for the product in each market in three different media outlets: TV, radio and newspaper. The client is not able to directly impact the amount of sales but he may to change amount spend on each media outlet. If we can understand the number of items sold as a function of spend on media we can suggest our client to adjust spending to increase units sold. In \ref{fig:sales} the sales are plotted on the Y axis and the budget for a media outlet on the X axis. \cite{hastie} uses this example to introduce terminology as well as the framework. The media budgets are the input variable and sales are the output variables. The input variables are commonly denoted with $X_i$, in example $X_1$ is the TV spend, $X_2$ the radio spend and $X_3$ the newspaper spend. The name for input variables has become inconsistent as the the terms predictor, independent variables and features can be used interchangeably. The output variable, in this example the sales, is also called the response or dependant variable and denoted with Y.
+    This thesis comprises \ref{end} sections. The goal of the first three sections is to introduce the GAM by explaining its components in order of increased complexity. Starting with the framework of statistical learning and the linear model followed by the generalized linear model and finishing with the GAM. Sections 5 details the implementation of GAMs in Spark and includes a language comparison of Spark and R. The final two sections evaluate the implementation by way of comparison and conclude with a discussion on future work.
     
-        \begin{figure}
+
+    
+        \section{Statistical Learning} \label{statlearn}
+     
+    Statistical learning is a set of tools for modeling and understanding complex data sets. Recent developments in statistics and computer science have created an interesting field that empowers modern statistical methods with computational ones. Statistical learning provides a  framework for asking and answering questions by using data. This thesis will focus on the generalized additive model, a method of the supervised learning branch of statistical learning. Supervised learning methods provide models for prediction and inference. They provide a framework for explaining response variables in terms of predictor variables. Statistical learning methods are essential for modern scientific research and have empowered many other branches of quantitative sciences. The practical application of these methods in the corporate world has coined the term Data Science.
+    
+    \subsection{Introduction to Statistical Learning}
+    
+    The benefits of statistical learning can be best explaining by the use of the following example \cite{hastie}. Assuming a statistical consultant is in charge of advising a client on how to improve the sales of a given product. The client provides a data set containing the sales of a given product across several markets and the associated marketing budget for three different media outlets: TV, radio and newspaper. The client is not able to impact the amount of sales directly, but he is able to change the amount spent on each media outlet. Understanding the number of items sold as a function of media spending enables the consultant to suggest a modified spending plan. This spending plan aims to increase sales by modifying media spending. In \ref{fig:sales} the sales are plotted on the Y-axis and the budget for a media outlet on the X-axis. This model interprets the media budgets as the input variables and sales as the output variables. The input variables are commonly denoted with $X_i$, in this example $X_1$ is the TV spent, $X_2$ the radio spent and $X_3$ the newspaper spent. The name for input variables has become inconsistent. The terms predictor, independent variables and features are treated as synonyms. The output variable, in this example the sales, is also called the response or dependant variable and denoted with $Y$.
+    
+        \begin{figure}["h"]
             \centering
             \includegraphics[width=\textwidth]{sales}
-            \caption{\cite{hastie} illustrates the units sold as a function of spend on each of the advertisement channels. The blue line is a linear model describing the underlying relationship between units sold and spend on media outlet.}
+            \caption{\cite{hastie} describes the units sold as a function of spending on each of the advertisement channels. The blue line is a linear model describing the underlying relationship between units sold and spending on media outlets.}
             \label{fig:sales}
+            
         \end{figure}
         
-    This example illustrates the notion behind statistical learning but fails to capture it's broad applicability. To generalize this example the essential question of statistical learning needs to be generalized. Supposed a data set contains observations of a quantitative response $Y$ and several predictors $X_1, X_2 , ... X_i$. Statistical learning is the practice of looking for a relationship $f()$ that describes the relationship in the following form:
+    The applied method can generalized by the following question: Given a data set with observations of a quantitative response $Y$ and several predictors $X_1, X_2 , ... X_i$, what is the underlying, unknown relationship $f()$? $f()$ explains $Y$ in terms of $X$. This can be formally stated as
     \begin{equation}
         Y = f(X) + \epsilon
     \end{equation}
-    The function $f()$ is a fixed but unknown function of the input variables $X_1, ... X_p$. $\epsilon$ is random, identical, independent distributed error term. Another way of framing this is to see the function $f()$ as the systematic information in the observations. All statistical learning methods are concerned with finding an optimal $f()$. This thesis will discuss three, related methods of finding $f()$. Each method with different idea on how to find $f()$ and with a different interpretation of optimal.
+    The function $f()$ is a fixed but unknown function of the input variables $X_1, ... X_p$. $\epsilon$ is a random, identical, independent distributed error term. Another way of framing this is to see the function $f()$ as the systematic information in the observations. All statistical learning methods are concerned with finding an optimal $f()$. This thesis will discuss three related methods of finding $f()$. Each method with a different approach to finding $f()$ and with a different interpretation of the optimal function $f$.
 
 
     \subsection{Why Estimate f()?}
@@ -160,7 +175,7 @@
         
     
     
-    \section{Linear Models}
+    \section{Linear Models}  \label{glm}
        I will examine the linear and generalized linear model in this section. The linear model is the an elementary member of statistical models and enforces a strict parametric form on the estimated function. Though linear models have limited real world applications they introduce many relevant ideas and concept for the following methods. The generalized linear model is the generalized version of the linear model and relaxes some restrictions set by the linear model. Both models are essential for understanding the generalized additive model which is the main subject of this thesis. Generalized additive models are an extension to the generalized linear model. For both models I will first introduce the relevant theory for the estimated function then explain how this function is estimated and conclude with an model example. 
         
         \subsection{Simple Linear Model}
@@ -173,7 +188,7 @@
       
         With $\beta$ being an unknown parameter that is to be estimated and $\epsilon_i$ error term for that row. A linear model assumes that $\epsilon_i$ are mutually independent zero mean random variables with the same variance $\sigma^2$. The linear model explains the response variable $Y$ in terms of a predictor variable $x$  multiplied by an estimated coefficient $\beta$ plus a random error term $\epsilon$. 
         
-        \begin{figure}
+        \begin{figure}["h"]
             \centering
             \includegraphics[width=\textwidth]{simple_linear_model}
             \caption{\cite{gamBook} visually described all relevant variables and their relationship}
@@ -455,7 +470,7 @@
         The proposed method will converge on the optimal parameter vector $\widehat{\beta}$
         \subsubsection{Generalized Linear Model Example}
     
-    \section{Generalized Additive Models}
+    \section{Generalized Additive Models}  \label{gam}
     Generalized additive model (GAM) allow predictor variables of GLM to be estimated with non-parametric methods. GAM has the interpretability advantages of GLMs where the contribution of each predictor variable to the function is clearly encoded. However, it has substantially more flexibility because the relationships between predictor and response variable are not assumed to be linear. GAMs assume the relationship between predictor in response variable to be the sum of functions. These functions are regularized by enforcing a smooth patter. These smooth functions can be estimated with a scatter plot smoother. \cite{gam} introduced GAMs and described many approaches to scatter plot smoothing. For practicability and applicability this thesis will focus on regression splines, especially cubic splines and cyclic cubic splines. \cite{gamBook} formally describe GAMs as:
     
     \begin{equation}
@@ -503,7 +518,7 @@
     The B-Spline basis is strictly local function. For a given basis order of m+2 the basis function is only non-zero between the m+3 knots. Each basis function is only non-zero over the intervals between m+3 adjacent knots. \cite{regressionspline} provides an insightful example of a B-Spline. B-Splines cover a broad range of basis functions and offer flexibility. Specifying an order for the basis am
             
             
-    \begin{figure}
+    \begin{figure}["h"]
             \centering
             \includegraphics[width=\textwidth]{bsplines}
             \caption{\cite{regressionspline} gives a visual example of a basis spline.}
@@ -515,26 +530,27 @@
     \subsubsection{Fitting Cubic Splines}
     A cubic basis is a reasonable choice for a B-Spline. Cubic splines B-Splines of order 4 with the additional condition that the first and second derivative are equal at the knot location. \cite{gamBook} illustrates the process of fitting a cubic spline to a data set with the predictor variable $x$ and response $y$. For this example the author chooses a specific cubic splines basis called rk. The function rk defines a cubic cyclic basis given a vector of values x and the relevant knots xk. The basis a possible cubic spline choice and introduced by \cite{gamBook}. With the function rk the model matrix to find a cubic spline can be written.  
     The function spl.X sets up the model matrix to fit a cubic spline. The function takes the data vector x and knot vector xk to produce the full model matrix. 
+    
     <<echo=FALSE, cache=TRUE>>=
     rk<-function(x,z) # R(x,z) for cubic spline on [0,1] 
-    { ((z-0.5)^2-1/12)*((x-0.5)^2-1/12)/4-
-    ((abs(x-z)-0.5)^4-(abs(x-z)-0.5)^2/2+7/240)/24
-    }
+        { ((z-0.5)^2-1/12)*((x-0.5)^2-1/12)/4-((abs(x-z)-0.5)^4-(abs(x-z)-0.5)^2/2+7/240)/24
+        }
     @
-     <<>>=
+     <<cache=TRUE>>=
      spl.X<-function(x,xk)
             # set up model matrix for cubic penalized regression spline    
         {   q<-length(xk)+2             # number of parameters
             n<-length(x)                # number of data
             X<-matrix(1,n,q)            # initialized model matrix
             X[,2]<-x                    # set second column to x
-            X[,3:q]<-outer(x,xk,FUN=rk) # and remaining to R(x,xk) X
+            X[,3:q]<-outer(x,xk,FUN=rk) # and remaining to R(x,xk) 
+            X
         }
      @
      
      The rows of the model matrix are determined by the number of elements in the data vector x. The first two columns of the model matrix are for encoding and of less interest for the thesis. The remaining elements of the model matrix are computing through the basis function rk. Given that the splines were designed to be linear in the unknown parameter $\beta$ the splines can be estimated with the methods introduced in section 1. The ability to fit an arbitrary function by defining the basis and solving the resulting matrix with a linear method is a key aspect of regression splines. To fit the spline we estimate the coefficients from the model matrix with a linear model. The exact fitting happens via the QR Decomposition described in section 1. The estimated coefficients get multiplied by the same design matrix that produced the coefficients to estimates fitted values. This process essentially fits the function to the data that was used to estimate the coefficients. 
      
-     <<>>=
+     <<cache=TRUE>>=
         
         size<-c(1.42,1.58,1.78,1.99,1.99,1.99,2.13,2.13,2.13, 2.32,2.32,2.32,2.32,2.32,2.43,2.43,2.78,2.98,2.98) 
         wear<-c(4.0,4.2,2.5,2.6,2.8,2.4,3.2,2.4,2.6,4.8,2.9, 3.8,3.0,2.7,3.1,3.3,3.0,2.8,1.7) 
@@ -627,7 +643,7 @@
     From the function prs.fit and \ref{penalty} it should be become evident that the choice of $\lambda$ has a significant influence on the shape of $f$. The figure below illustrates the influence of $\lambda$ on the shape of $f$
     
     
-    \begin{figure}
+    \begin{figure}["h"]
             \centering
             \includegraphics[width=\textwidth]{lambda}
             \caption{\cite{gamBook} states the influence of $\lambda$ on the resulting function $f$.}
@@ -741,7 +757,7 @@
         y1<-y;y1[(n+1):(n+q)]<-0 # augment data 
         b<-lm(y1~X1-1) # fit model 
         trA<-sum(influence(b)$hat[1:n]) # tr(A) 
-        norm<-sum((y-fitted(b)[1:n])^2) # RSS 
+       norm<-sum((y-fitted(b)[1:n])^2) # RSS 
         list(model=b,gcv=norm*n/(n-trA)^2,sp=sp)
     }
     @
@@ -761,7 +777,7 @@
     data(trees)
     rg <- range(trees$Girth)
     rh <- range(trees$Height)
-    # rescaling of parameter to onto [0,1]
+    ## rescaling of parameter to onto [0,1]
     trees$Girth <- (trees$Girth - rg[1])/(rg[2]-rg[1]) 
     trees$Height <- (trees$Height - rh[1])/(rh[2]-rh[1])
     am0 <- am.setup(trees$Girth,trees$Height)
@@ -783,7 +799,7 @@
     The resulting smoothing parameter for Girth is fairly presumably allowing $f_1$ some curvature. Height has a very high smoothing parameter, this most likely results in a rather straight line.  he values of the smooths at the predictor variable values can be obtained quite easily by zeroing all model coefficients, except those corresponding to the term of interest, and using predict as the following code shows.
 
     
-    <<echo=FALSE, cache=TRUE>>=
+    <<echo=FALSE, cache=TRUE, fig.height=4, fig.width=4, fig.pos="t">>=
     
     # plot 
     plot(trees$Volume,fitted(best$model)[1:31],
@@ -854,28 +870,6 @@
     \subsubsection{Generalized Additive Model Example}
     Fitting a GAM with the fit.gamG function we can see a slightly better fit than th
     
-    <<echo=FALSE, cache=TRUE>>=
-    sp<-c(0,0) # initialize smoothing parameter (s.p.) array 
-    for (i in 1:30) for (j in 1:30) # loop over s.p. grid
-    { 
-        sp[1]<-1e-5*2^(i-1);sp[2]<-1e-5*2^(j-1)     # s.p.s 
-        b<-fit.gamG(trees$Volume,am0$X,am0$S,sp)      # fit using s.p.s.
-        if (i+j==2) best<-b else                    # number of data
-        if (b$gcv<best$gcv) best<-b                 # augmented X
-    }
-    best$sp # GCV best smoothing parameter 
-    
-    # plot 
-    plot(trees$Volume,fitted(best$model)[1:31],
-        xlab="Fitted Volume",ylab="Actual Volume") 
-    b<-best$model
-    b$coefficients[1]<-0 # zero the intercept 
-    b$coefficients[11:19]<-0 # zero the second smooth coefs 
-    f0<-predict(b) # predict f_1 only, at data values 
-    plot(trees$Girth,f0[1:31],xlab="Scaled Girth",
-     ylab=expression(hat(f[1])))
-
-    @
     
     
     \section{Apache Spark}
@@ -906,7 +900,7 @@
     
     
     
-    \section{Matrix Algebra Appendix}
+    \section{Matrix Algebra Appendix} \label{end}
         \subsection{QR Decomposition}
         
     
