@@ -152,7 +152,7 @@
     
     \subsection{Statistical Computing Environment: R}
         
-    R is a free software environment for statistical computing and graphics. R is designed to express statistical models and comes with an development environment that is build to illustrate and discover data. R is widely recognized as language for statistical research. \cite{hastie} and \cite{gamBook} employ R to illustrate statistical concepts in a computational environment. This thesis uses R to express statistical concepts and examples. This section introduces relevant syntax for matrix manipulation in R:
+    R is a free software environment for statistical computing and graphics. R is designed to express statistical models and comes with an development environment that is built to illustrate and discover data. R is widely recognized as language for statistical research. This thesis uses R to express statistical concepts and examples. This section introduces relevant syntax for matrix manipulation in R:
     
   <<chunk1>>=
     # A vector is the essential data type in R
@@ -176,17 +176,18 @@
     
     
     \section{Linear Models}  \label{glm}
-        The linear model is the an elementary member of statistical models and enforces a strict parametric form on the estimated function. Though linear models have limited real world applications they introduce many relevant ideas and concept for the following methods. The generalized linear model is the generalized version of the linear model and relaxes some restrictions set by the linear model. Both models are essential for understanding the generalized additive model which is the main subject of this thesis. Generalized additive models are an extension to the generalized linear model. For both models I will first introduce the relevant theory for the estimated function then explain how this function is estimated and conclude with an model example. 
+        The linear model is the elementary form of statistical models. It enforces a strict parametric form on the estimated function and belongs to the parametric methods. Even though linear models have limited real world applications they introduce many relevant ideas and concepts for the following methods. The generalized linear model is the generalized version of the linear model and eases some restrictions set by the linear model. Both models are essential for understanding the GAM, which is the main subject of this thesis. The GAM is an extension of the generalized linear model. In the following, the theory behind linear and generalized linear models is explained, before these theories are used in the estimation process. Finally, the theories are applied in an exemplary fitting process.  
+        
         
         \subsection{Simple Linear Model}
         
-        The linear model, also linear regression, is a simple but interesting method central to many other more sophisticated methods. The simple linear model is the simplest linear model. A simple linear model explains a normal distributed response variable to be explained in terms of one explanatory variable. \cite{gamBook} describes the theory for a linear model with one explanatory variables as following: Given $n$ observations of $x_i$ and $y_i$. Where $y_i$ is the observations of a random variable $Y_i$ with expectation $\mu_i \equiv E(Y_i)$. A linear model assumes a model of the following parametric form:
+        The simple linear model (or linear regression), explains the response variable as the linear combination of a predictor variable and the estimated coefficients. It is the simplest linear model and explains a normal distributed response variable in terms of one explanatory variable. \cite{gamBook} describes the theory for a linear model with one explanatory variable as follows: Given $n$ observations of $x_i$ and $y_i$ where $y_i$ is the observations of a random variable $Y_i$ with expectation $\mu_i \equiv E(Y_i)$, a linear model has the following parametric form:
         
         \begin{equation}
             Y_i = x_i \beta + \epsilon_i \ where \mu_i = x_i \beta
         \end{equation}
       
-        With $\beta$ being an unknown parameter that is to be estimated and $\epsilon_i$ error term for that row. A linear model assumes that $\epsilon_i$ are mutually independent zero mean random variables with the same variance $\sigma^2$. The linear model explains the response variable $Y$ in terms of a predictor variable $x$  multiplied by an estimated coefficient $\beta$ plus a random error term $\epsilon$. 
+        $\epsilon_i$ is the error term for that row and the estimated parameter $\beta$ that. A linear model assumes that $\epsilon_i$ are mutually independent zero mean random variables with variance $\sigma^2$. The linear model explains the response variable $Y$ in terms of a predictor variable $x$  multiplied by an estimated coefficient $\beta$ plus a random error term $\epsilon$. 
         
         \begin{figure}["h"]
             \centering
@@ -196,7 +197,7 @@
         \end{figure}
         
         
-        $y_i$ and $x_i$ are known but $\beta$ is unknown and thus needs to be estimated. The simple model linear model gives one approach to estimate $\beta$ from the given data $x_i$,$y_i$. The simple linear model seeks to find the $\beta$ that minimizes the squared difference between $y_i$ and $x_i \beta$. Formalizing this notion amounts to defining the least squares measure  $S$ as:
+        $y_i$ and $x_i$ are known but $\beta$ is unknown and thus needs to be estimated. The simple model linear model gives one approach to estimate $\beta$ from the given data $x_i$,$y_i$. The simple linear model seeks to find the $\beta$ that minimizes the squared difference between $y_i$ and $x_i$. Formalizing this notion leads to the definition of the least squares measure $S$:
         
         \begin{equation} 
         \mathbf{S} =  \sum_{i=1}^{n}(y\textsubscript{i} - x\textsubscript{i}\beta)^{2} = \sum_{i=1}^{n}(y\textsubscript{i} - \mu\textsubscript{i})^{2} 
@@ -217,9 +218,9 @@
         Minimizing $S$ w.r.t. $\beta$ to compute $\widehat{\beta}$ is a reasonable approach when dealing with one explanatory variable. The Gauss-Markov theorem shows that estimating $\beta$ with $\widehat{\beta}$ is best linear unbiased estimator. However, most relevant linear models involve more explanatory variables than one. The question for finding must be account for multiple explanatory variables but the measure of fit $S$ remains.
       
         \subsection{Linear Model}
-         \cite{gamBook} introduces the linear model as the generalization of the simple linear model, allowing for the response variable to be explained with multiple predictor variables. Though the linear model generalizes the simple linear model it still assumes a normal distributed $Y$
+         \cite{gamBook} introduces the linear model as the generalization of the simple linear model, allowing for the response variable to be explained with multiple predictor variables. Though the linear model generalizes the simple linear model it still assumes a normal distributed $Y$.
         \subsubsection{Linear Model in the vector-matrix form}
-        Allowing for several predictor variables amounts to rewriting the simple linear model in terms of vectors and matrices. A major benefit of using the matrix-vector forms is that the problem of finding $\beta$ becomes the problem of solving a overdetermined system of equations. Again, given n observations of $y_i$ and $x_i$ plus some additive constant. Explicitly writing each $\mu_i = x_i \beta_i$ illustrates the shape of the system of equations.
+        Several predictor variables require rewriting the simple linear model in terms of vectors and matrices. A major benefit of using the matrix-vector forms is that the problem of finding $\beta$ becomes the problem of solving an overdetermined system of equations. Again, given n observations of $y_i$ and $x_i$ plus some additive constant. Explicitly writing each $\mu_i = x_i \beta_i$ illustrates the shape of the system of equations.
         \begin{equation}
         \begin{align*} 
         \begin{matrix}
@@ -231,129 +232,128 @@
         \end{align*}     
         \end{equation}
         
-        For the linear model this system of equations must now be rewritten in matrix form resulting in the matrix-vector form.  The matrix-vector form for the simple linear model takes the following shape. 
+        For the linear model this system of equations must now be rewritten in matrix form resulting in the matrix-vector form.  The matrix-vector form for the simple linear model takes the following shape: 
         \begin{equation}
        \left[ \begin{array}{c} \mu_1 \\ \mu_2 \\ \mu_3 \\ ... \\  \mu_n\end{array} \right] = \begin{bmatrix} 1 & x_1 \\ 1 & x_2 \\ 1 & x_3 \\ ... \\1 & x_n   \end{bmatrix}  \left[ \begin{array}{c} \beta_0 \\ \beta_1 \end{array} \right]   
         \end{equation}
         
-        Now, adding predictor variables and generalizing the simple linear model amounts to appending a predictor variable vector to the matrix and introducing a new coefficient to the coefficient vector.
+        Adding predictor variables and generalizing the simple linear model amounts to appending a predictor variable vector to the matrix and introducing a new coefficient to the coefficient vector:
         
         \begin{equation}
            \left[ \begin{array}{c} \mu_1 \\ \mu_2 \\ \mu_3 \\ ... \\  \mu_n\end{array} \right] = \begin{bmatrix} 1 & x_1 & x_2\\ 1 & x_2 & x_2 \\ 1 & x_3 & x_3 \\ ... \\1 & x_n & x_n   \end{bmatrix}  \left[ \begin{array}{c} \beta_0 \\ \beta_1 \\ \beta_2 \end{array} \right]   
         \end{equation}
     
-        The matrix-vector form yields the general form the linear model $\mu = X\beta$. This means that the value vector $\mu$ is given by the model matrix $X$ times the unknown parameter vector $\beta$. The model matrix can account for an arbitrary amount of predictor variables by adding a column for each predictor. The nature of the predictor variable: continuous or discrete plays an important role in the construction of the model matrix. Dummy and factor encoding are the two approaches when dealing with factor variables. For an thorough text on factor encoding in linear models see \cite{regression}. The model matrix is also known as design matrix and the terms are used interchangeably. $\mu = X\beta$ is the canonical form of a linear model. The method for estimating $\beta$ for one predictor do not work for the matrix-vector form and need to adjusted for estimating the unknown vector $\beta$. 
+        The matrix-vector form yields the general form of the linear model $\mu = X\beta$. This means that the value vector $\mu$ is given by the model matrix $X$ multiplied by the unknown parameter vector $\beta$. The model matrix can account for an arbitrary amount of predictor variables by adding a column for each predictor. Continuous and discrete predictor variables require special encoding in the model matrix. Dummy and factor encoding are the two approaches for factor variables. For a detailed explanation on factor encoding in linear models see \cite{regression}. The model matrix is also known as a design matrix and the terms are used interchangeably. $\mu = X\beta$ is the canonical form of a linear model. The method for estimating $\beta$ for one predictor does not work for the matrix-vector form and requires adjustment for estimating the unknown vector $\beta$. 
         
         \subsubsection{Estimating Linear Models}
-        \cite{gamBook} states estimating the vector of unknown parameters as finding the least squares solution to $\beta$. The computationally stablest and fastest method involves QR decomposing the model matrix to express $\widehat{\beta}$ in terms of the upper triangular matrix. This method is widely used in statistical packages and relevant for the numerically optimized version of  generalized additive model. This approach involves stats with the linear model in the full matrix-vector form:
+        \cite{gamBook} describes the estimation process for unknown parameter vectors as finding the least squares solution to $\beta$. The computationally stablest and fastest method involves QR-decomposing the model matrix to express $\widehat{\beta}$ in terms of the upper triangular matrix. This method is widely used in statistical packages and is relevant for the numerically optimized version of the GAM. This approach involves starts with the linear model in the full matrix-vector form:
          
          \begin{equation}
              \mu = X \beta, y \approx N(\mu, I_n, \sigma^2)
          \end{equation}
         
-        The model matrix $X$ is a matrix with n rows and p columns. With n being the number of observations and p is a product of predictors and their encoding. The least squares estimation for $\beta$ is the best linear unbiased estimator with least variance, \cite{gamBook} provides a full proof. Estimating $\beta$ relies on the Euclidean length of a vector. The Euclidean length of a vector is the sum squared of its elements. For a vector v in n dimensional space the Euclidean length is defined as:
+        The model matrix $X$ is a matrix with n rows and p columns. With n being the number of observations and p is a product of predictors and their encoding. The least squares estimation for $\beta$ is the best linear unbiased estimator with least variance, \cite{gamBook} provides a full proof. Estimating $\beta$ relies on the minimizing the Euclidean length of a vector. The Euclidean length of a vector is the sum squared of its elements. For a vector v in n dimensional space the Euclidean length is defined as:
         
         \begin{equation}
             \left \| v \right \|^2 \equiv v^T v \equiv \sum_{n}^{i=1} v^2
         \end{equation}
         
-        An essential fact about the Euclidean length is that the rotation a matrix does not change its length. The practical method for fitting least squares heavily leverages this fact. This also holds for the rotation of $y-X\beta$. Bootstrapping the Euclidean length to define our measure $S$ in the matrix-vector framework yields
+        An essential fact about the Euclidean length is that the rotation of a matrix does not change its length. This property can be used to estimate $\beta$ from a rotated orthogonal matrix. This also applies to the rotation of $y-X\beta$. Bootstrapping the Euclidean length to define our measure $S$ in the matrix-vector framework yields
         
         \begin{equation}
            \label{S} S =  \left \| y - \mu \right \|^2 = \| y = X\beta \|^2 
         \end{equation}
         
-        \cite{gamBook} describes QR decomposition of a matrix as the essential method for estimating $\beta$ and also an essential method for finding generalized additive models. Any real matrix X can always decomposed into an orthogonal matrix and triangular matrix.
+        \cite{gamBook} describes QR-decomposition of a matrix as the essential method for estimating $\beta$ and also as an essential method for finding generalized additive models. Any real matrix X can be decomposed into an orthogonal matrix and triangular matrix.
         
         \begin{equation}
         X = Q\begin{bmatrix}R \\ 0 \end{bmatrix} = Q_f R
         \end{equation}
         
-        $R$ is the upper triangular matrix with p rows and p columns and $Q$ is an orthogonal matrix with n rows and n columns of which the first p columns form $Q_f$. By definition does multiplying a vector with an orthogonal matrix not change the their length. The matrix algebra appendix provide more detail on these concepts. The QR decomposition decomposes a matrix into two district matrices that have different properties but maintain their length. Multiplying an orthogonal matrix with $S$ does not change the length. Applying the QR decomposition of the model matrix in \ref{S} yields in:
+        $R$ is the upper triangular matrix with p rows and p columns and $Q$ is an orthogonal matrix with n rows and n columns of which the first p columns form $Q_f$. By definition multiplying a vector with an orthogonal matrix does not change their length. The matrix algebra appendix provides more detail on these concepts. The QR-decomposition divides a matrix into two district matrices that have different properties but maintain their lengths. Multiplying an orthogonal matrix with $S$ does not change the length. Applying the QR decomposition of the model matrix in \ref{S} yields in:
         
         \begin{equation}
              \left \| y - X\beta^2\right \|  =  \left \| Q^Ty - Q^T X\beta^2\right  \| =  \| Q^T-y \begin{bmatrix} R \\ 0 \end{bmatrix} \beta \|^2
         \end{equation}
         
-        Only the orthogonal matrix of the QR decomposed model matrix gets multiplies to the the response variable vector and the original model matrix. Multiplying $Q^T$ with the response vector can be stated as $Q^T y = \begin{bmatrix} f \\ r \end{bmatrix}$. Where $f$ is vector of p dimensions and hence r is a vector of  $n-p$ dimension.
+        Only the orthogonal matrix of the QR-decomposed model matrix gets multiplied with the response variable vector and the original model matrix. Multiplying $Q^T$ with the response vector can be stated as $Q^T y = \begin{bmatrix} f \\ r \end{bmatrix}$. Where $f$ is vector of p dimensions and hence r is a vector of $n-p$ dimension.
         
         \begin{equation}
             \left \| y - X\beta\right \|^2  =  \left \| \begin{bmatrix} f \\ r \end{bmatrix} - \begin{bmatrix} R \\ 0 \end{bmatrix}\beta\right \|^2 =  \| f-R \beta \|^2 + \|r \|^2
         \end{equation}
         
-        This complicated form exposes the residual error $r$ as independent of $\beta$. $\| f - R \beta \|^2$ can be reduced to zero by choosing $\beta$ so that $R\beta$ equals $f$, thus the estimator $\widehat{\beta}$ can be stated as 
+        This complicated form exposes the residual error $r$ as independent of $\beta$. $\| f - R \beta \|^2$ can be reduced to zero by choosing $\beta$ so that $R\beta$ equals $f$, the estimator $\widehat{\beta}$ can be stated as 
         
         \begin{equation}
             \widehat{\beta} = R^{-1} f
         \end{equation}
         
-        The reducible error, also called residual error is the difference between the model matrix multiplies with the estimated $\beta$ minus the value for y. $\|r\|^2 = \|y-X \widehat{\beta\x}\|^2$. 
+        The reducible error, also called residual error is the difference between the model matrix multiplied by the estimated $\beta$ minus the value for y. $\|r\|^2 = \|y-X \widehat{\beta\x}\|^2$. 
         
     \subsubsection{Influence Matrix}
-    The hat or influence matrix is the projection matrix that maps the $y$ vector into the column space of $X$. Given a design matrix $X$ with n rows and p columns and $n > p$. The $y$ vector cannot lie in the column space of X. The hat matrix is the projection of $y$ into the column space of $X$. Since the projection is an approximation the matrix is called hat matrix. The hat matrix is required for the prediction piece of linear models and plays an important role for generalized additive models. \cite{gamBook} introduces the influence matrix as the matrix that yields the predicted fitted value vector $\widehat{\mu}$. To obtain $\widehat{\mu} $the hat matrix is post multiplied with the data vector $y$. The influence matrix is required to compute the estimated value vector. The first p columns of Q make up the matrix $Q_f$. $f$ is then defined as $f = Q_f y$ which implies that 
+    The hat or influence matrix is the projection matrix that maps the $y$ vector into the column space of $X$. Given a design matrix $X$ with n rows and p columns and $n > p$, the $y$ vector cannot lie in the column space of X. The hat matrix is the projection of $y$ into the column space of $X$. Since the projection is an approximation the matrix is called hat matrix. The hat matrix is required for the prediction piece of linear models and plays an important role for generalized additive models. \cite{gamBook} introduces the influence matrix as the matrix that yields the predicted fitted value vector $\widehat{\mu}$. To obtain $\widehat{\mu}$, the hat matrix is post multiplied with the data vector $y$. The influence matrix is required to compute the estimated value vector. The first p columns of Q make up the matrix $Q_f$. $f$ is then defined as $f = Q_f y$ which implies that 
     
     \begin{equation}
         \widehat{\beta} = R^{-1} Q_f^T y 
     \end{equation}
     
-    Given that $\widehat{\mu} = X \widehat{\beta}$ and $X = Q_fR$ the fitted value vector can be written as 
+    Given that $\widehat{\mu} = X \widehat{\beta}$ and $X = Q_fR$, the fitted value vector can be written as 
     \begin{equation}
         \widehat{\mu} = Q_f RR^-1 y = Q_fQ_f^T_f y  
     \end{equation}
-    Since the upper triangular matrix $R$ is multiplied its inverse we can factor them out resulting with the hat matrix $A \equiv Q_f Q_f^T$ that fulfills $\widehat{\mu} = Ay$.  The hat matrix will essential in cross validating the estimated $\widehat{y}$ values. Generalized additive models will iteratively minimize the distance difference between the $\widehat{y}$ and $y$ . Details will be given in later sections.
+    Since the upper triangular matrix $R$ is multiplied by its inverse we can factor them out resulting with the hat matrix $A \equiv Q_f Q_f^T$ that fulfills $\widehat{\mu} = Ay$.  The hat matrix is essential in cross validating the estimated $\widehat{y}$ values. Generalized additive models iteratively minimize the difference in distance between the $\widehat{y}$ and $y$. The hat matrix provides a stable and efficient way to compute the $\widehat{y}$ values. 
     
     \subsubsection{Simple linear model example}
         
         
     \subsection{Generalized Linear Model}
-    The generalized linear model (GLMs) is an extension to the general linear model, allowing the response variable $Y$ to be of any exponential family distributions. The exponential family of distributions contains many practical useful distributions including Poisson, bionomial, gamma and normal distributions. A formal description of it's basis structure can be given as:
+    The generalized linear model ("GLM") is an extension of the general linear model. It it is less restrictive on the response variable by allowing it to be distributed according to any of the exponential family distributions. The general linear model only allows normally distributed response variables. Exponential family distributions contain many practical distributions including Poisson, binomial and gamma. The binomial distribution is commonly used to model a binary outcome and the Poisson distribution is used to model occurrences.The GLM can be formally described as:
 
         \begin{equation} g(\mu_i) = X_i \beta_i \end{equation}
 
-
-   $X_i$ is the $i^th$ row of a model matrix X and $\beta$ is a vector of unknowns parameters with $\mu_i \equiv E(Y_i)$ and $Y_i$ is distributed according to some exponential family. Every exponential family distribution has a canonical link function $g()$. The link function allows to estimate the linear functions of the predictor variables by transforming the right side of the equation $f(x)$. The data are then fit in this transformed scale but the expected variance is calculated on the original scale of the predictor variables. The link functions is essential in modelling exponential functions in linear terms. Fitting several distributions with a single framework at a cost: While the least squares approach was sufficient for estimating $\beta$ for normal distributed data with zero mean error the generalized estimation method has to account for an arbitrary amount of distribution parameters. \cite{glm} introduces iterative reweighted least squares (IRLS) as a method to obtain maximum likelihood estimates (MLE) for a particular exponential family distribution. IRLS is the generalization of the least squares approach from normal distribution to any exponential family distribution. A practical feature of GLMs is that they can all be fitted using IRLS, independent of response variable distribution. 
+    The GLM models the link function $g()$ of the expected value $\mu_i$ as the linear combination of the model matrix $X$ and the estimated coefficients $\beta$. $X_i$ is the $i^th$ row of a model matrix X and $\beta$ is a vector of unknown parameters. The GLM models the expected value of the random variable $Y$ with $\mu_i \equiv E(Y_i)$. $Y_i$ is assumed to be distributed according to some exponential family. Every exponential family distribution has a canonical link function $g()$. The link function transfers the exponential functions into linear space and each exponential distribution comes with a canonical link function. The canonical link function transforms the expected value into the space of the estimated coefficients. The coefficients are estimated by transforming the right side of the equation. The data is then fit in this transformed scale but the expected variance is calculated on the original scale of the predictor variables. While the least squares approach was sufficient for estimating the coefficients for a normal distributed response with zero mean error, it fails to estimate an arbitrary amount of distribution parameters required for the GLM. \cite{glm} introduces iterative re-weighted least squares ("IRLS") as a method to obtain maximum likelihood estimates ("MLE") for a particular exponential family distribution. IRLS can be interpreted as the generalization of the least squares approach from normal distribution to any exponential family distribution. A practical feature of GLMs is that they can all be fitted using IRLS, independent of response variable distribution. 
  
     \subsubsection{Maximum-Likelihood Estimation}
     
     \cite{glm} describes the principle of maximum likelihood estimation as searching for probability distribution parameters that makes the observed data most likely. This results in a search for the parameter vector that maximizes the likelihood function $L(\beta|y)$. The parameter vector is found by searching the multi-dimensional parameter space.
 
-    \cite{MLE} describes MLE as finding the parameters for a distribution that were most likely to produce the given data. Random variable are defined in terms of one or several parameters. A good choice of parameters results in a distribution that emulates the given data. The least squares linear model estimated the $\mu$ and $\sigma$ for $N( \mu ,\sigma^2)$ by minimizing $S$ is a special case of the MLE, only allowing for normal distributed data. \cite{glm} introduces a method to account estimate parameters for any exponential family distributions members. Exponential family distributions have arbitrary number of parameters. Examle for these parameters are the Poisson distribution  $P(\lambda)$  and gamma distribution $G(K,\theta)$. Maximum likelihood estimation provides a single framework to allow parameter estimation for any of the exponential family distributions.
+    \cite{MLE} describes MLE as finding the parameters for a distribution that were most likely to produce the given data. Instead of searching for a coefficient vector that minimizes the squared distance, MLE searches for a particular distribution that most likely would have generate the data. Random variables are defined in terms of one or several parameters. A good choice of parameters results in a distribution that emulates the given data. The least squares linear model estimates the $\mu$ and $\sigma$ for $N( \mu ,\sigma^2)$ by minimizing $S$ and is a special case of the MLE, only allowing for normally distributed data. \cite{glm} introduces a method to estimate parameters for any exponential family distribution. Exponential family distributions have arbitrary numbers of parameters.  The Poisson, for example, only requires one parameter $P(\lambda)$ and the gamma distribution $G(K,\theta)$ two. Maximum likelihood estimation provides a single framework to allow parameter estimation for any of the exponential family distributions.
 
-    From a statistical analysis point of view the vector $y$ of observed data is a random sample from an unknown population. The goal of maximum likelihood estimation is to find the parameters of the given distribution that most likely have produced this sample. This process is described with a probability density function (PDF) $f()$ of observed data $y$ given a parameter $\beta$: $f(y|\beta)$. If individual observations, $y_i$’s, are statistically independent of one another, the PDF for the data $y$ given the parameter vector $\beta$ can be expressed as a multiplication of PDFs for individual observations.
+    From a statistical analysis point of view the vector $y$ of observed data is a random sample from an unknown population. The goal of maximum likelihood estimation is to find the parameters of the given distribution that most likely  produced this sample. This process is described with a probability density function (PDF) $f()$ of observed data $y$ given a parameter $\beta$: $f(y|\beta)$. If individual observations, $y_i$’s, are statistically independent of one another, the PDF for the data $y$, given the parameter vector $\beta$, can be expressed as a multiplication of PDFs for individual observations.
 
     \begin{equation} f(y|\beta) = f((y_1, y_2,...,y_n) | (\beta_1,\beta_2, ... \beta_n )) = \prod_{i=1}^{n} f_i(y_i|\beta_i) ) \end{equation}
 
-    Given a set of parameter values, the corresponding PDF will show that some data are more probable than other data.  However, the data is already given and we are searching for the parameters of the distribution that most likely produced the data. The casual term most likely is referring to maximizing likelihood. We thus inverse our function $f(y|\beta)$ to $L(\beta|y)$ to produce the likelihood of $y$ given the parameters $\beta$. Theoretically MLE need not exist nor be unique. But if they exist and are unique they can be estimated. For computational convenience, the MLE estimate is obtained by maximizing the log-likelihood function, $ln(L(\beta|y))$: This is because the two functions, $ln(L(\beta|y))$ and $L(w|y)$; are monotonically related to each other so the same MLE estimate is obtained by maximizing either one and the log-likelihood is preferred for obvious reasons. Assuming that the log-likelihood function, $ln(L(\beta|y))$ is differentiable, if $\beta$ exists, it must satisfy the following partial differential equation known as the likelihood equation:
+    Given a set of parameter values, the corresponding PDF will show that some data are more probable than other data. However, the data is already given and the search is for the parameters of the distribution that most likely produced the data. Thus the conditional probability is reversed. From $f(y|\beta)$ to $L(\beta|y)$ produces the likelihood of $y$ given the parameters $\beta$. For computational convenience, the MLE is obtained by maximizing the log-likelihood function, $ln(L(\beta|y))$. This is because the two functions, $ln(L(\beta|y))$ and $L(w|y)$ are monotonically related to each other. Consequently the same MLE estimate is obtained by maximizing either one. However, the log-likelihood is preferred for obvious reasons. Assuming that the log-likelihood function $ln(L(\beta|y))$ is differentiable, if $\beta$ exists, it must satisfy the following partial differential equation known as the likelihood equation:
 
     \begin{equation} \frac{\partial ln L(\beta|y)}{\partial \beta_i} = 0 \end{equation}
 
-    This properties are given because the definition of maximum or minimum of a continuous differentiable function implies that its first derivatives vanish at such points. The likelihood equation represents a necessary condition for the existence of an MLE estimate. An additional condition must also be satisfied to ensure that $ln(L(\beta|y))$ is a maximum and not a minimum, since the first derivative cannot reveal this. The log likelihood must be convex near w. This is verified by calculating the second derivatives of the log-likelihoods and checking if they are negative.
+    These properties are given because the definition of the maximum or minimum of a continuous differentiable function implies that its first derivatives vanish at such points. The likelihood equation represents a necessary condition for the existence of an MLE estimate. An additional condition must also be satisfied to ensure that $ln(L(\beta|y))$ is a maximum and not a minimum, since the first derivative cannot reveal this. The log-likelihood must be convex near w. This is verified by calculating the second derivatives of the log-likelihoods and checking if they are negative.
 
     \begin{equation} \frac{\partial^2 ln L(\beta|y)}{\partial \beta^2_i} < 0 \end{equation}
 
-    This form is only of theoretical value as practical model often involves many parameters and have highly non-linear PDFs. Thus the estimate must be sought numerically using nonlinear optimization methods. The basic idea for these methods is to find optimal parameters that maximize the log-likelihood focusing on smaller sub-sets of the multi-dimensional parameter space. This is the preferred because exhaustively searching the whole parameter space becomes intractable with an increasing amount of parameters. The practical method for MLE searches by trial and error over the course of a series of iterative steps. Each iteration changes the results from the previous iteration by a small value. The choice of the value is tailored to improve the log-likelihood. \cite{glm} introduces a metthod called iterative reweighted least squares and is subject in the next section.
+    This form is only of theoretical value as practical models often involve many parameters and have highly non-linear PDFs. Thus the estimate must be sought numerically using non-linear optimization methods. The basic idea for these methods is to find optimal parameters that maximize the log-likelihood focusing on smaller sub-sets of the multi-dimensional parameter space. This is the preferred approach because exhaustively searching the whole parameter space becomes intractable with an increasing amount of parameters. The practical method for MLE searches by trial and error over the course of a series of iterative steps. Each iteration changes the results from the previous iteration by a small value. The choice of the value is tailored to improve the log-likelihood. GLM are fit by a method called iterative re-weighted least squares and is subject of the next section.
         
-        \subsubsection{Fitting Generalized Linear Models}
+\subsubsection{Fitting Generalized Linear Models}
     
-    \cite{gamBook} introduces iterative reweighted least squares (IRLS) as the practical method for fitting GLMs. The method method must find the distribution parameters and account for unequal variance. GLM models an n-vector of independent response variables $Y$, where $\mu$ is the expected value of $Y$ as:
+    GLMs models are fit via distribution parameter estimation with MLE. The GLM assume a specific structure for the mean and variance of the distribution. This section  demonstrates a general approach to estimating the mean and variance of any exponential distribution with IRLS. IRLS iteratively computes the expected values for a given set of distribution parameters and checks if they have improved. Improved in this context means that the new choice of distribution parameters produces better expected values that are closer to the original $y$ values than the previous estimate. To account for a varying error term each observation is weighted according to its local average. This method gives more weight to observations that are extraordinary compared to its local mean. IRLS applies the weights to each observation to account for the varying error. The GLM models an n-vector of independent response variables $Y$, where $\mu$ is the expected value of $Y$:
     
     \begin{equation}
         g(\mu_i) = X_i \beta
     \end{equation}
     
-    With $\mu \equiv E(Y)$ and the link transformation of $Y_i$ as $Y_i \approx f_\theta_i (y_i)$ where $f_\theta_i$ stands for the canonical link transformation of an exponential family distribution. The value of $mu_i$ is the to determined by finding $\beta$. With this in mind the probability mass function for any exponential family distribution can be written as:
+    With $\mu \equiv E(Y)$ and the link transformation of $Y_i$ as $Y_i \approx f_\theta_i (y_i)$ where $f_\theta_i$ stands for the canonical link transformation of an exponential family distribution. The value of $mu_i$ is determined by finding $\beta$. IRLS provides an estimation process for every exponential family distribution. The estimation of distribution parameters are hence derived from a equation that is general to any exponential family. The GLM assumes that every exponential family distribution can be expressed in terms of its mean and variance. The following equation shows how to generate the mean and the variance of any exponential distribution via the probability mass function (PMF).
     
     \begin{equation}
         f_\theta = exp[\{y\theta-b(\theta)\}/a(\phi)+c(y, \phi)]
     \end{equation}
     
-    $a,b$ and $c$ are arbitrary functions, $\phi$ an arbitrary scale parameter and the $\theta$ the canonical link parameters. The interesting property of this form is that the general expression for mean and variance of exponential family distributions can be expressed in terms of $a,b$ and $\phi$. The mean and the variance are the required parameters to fit any exponential family distribution and are computed via deriving the log-likelihood. Since the natural logarithm is the inverse of the exponential function the log-likelihood has a familiar form.
+    $a,b$ and $c$ are arbitrary functions, $\phi$ an arbitrary scale parameter and the $\theta$ the canonical link parameters. The interesting property of this form is that the general expression for mean and variance of exponential family distributions can be expressed in terms of $a,b$ and $\phi$. The mean and the variance are the required parameters to fit any exponential family distribution and are computed via deriving the log-likelihood. Since the natural logarithm is the inverse of the exponential function, the log-likelihood can be written as:
     
     \begin{equation}
         l(\theta) = [y\theta - b(\theta)] / a(\phi) + c(y,\phi) 
     \end{equation}
     
-    $E(Y)$ can now computing by differentiating $l$ w.r.t. $\theta$ and treating $l$ as a random variable. This amounts to replacing the particular value $y$ with the random variable $Y$.
+    $E(Y)$ can now compute by differentiating $l$ w.r.t. $\theta$ and treating $l$ as a random variable. This leads to a replacement of the particular value $y$ with the random variable $Y$.
     
     \begin{equation}
         \frac{\partial l }{\partial \theta} = [y-{b}'(\theta))]/a(\phi))    
@@ -363,45 +363,45 @@
         E(\frac{\partial l }{\partial \theta}) = [E(Y)-{b}'(\theta))]/a(\phi))
     \end{equation}
     
-    Given that $E(\partial l / \partial \theta) = 0$ the expected value of the random variable Y can be stated as:
+    Given that $E(\partial l / \partial \theta) = 0$, the expected value of the random variable $Y$ can be stated as:
     
     \begin{equation}
         E(Y) = {b}'(\theta)
     \end{equation}
     
-    This results in a method to compute the mean of any exponential family random variable by the first derivative of b w.r.t $\theta$. This the direct link between the $\beta$ and the model parameter. Allowing the parameter $\beta$ to determine the mean of the response variable and consequentially the canonical parameter is the proper way to find that value. The variance of that random variable can be computed from the second derivative of the log-likelihood:
+    This results in a method to compute the mean of any exponential family random variable by the first derivative of b w.r.t $\theta$. This the direct link between the $\beta$ and the model parameter. Allowing the parameter $\beta$ to determine by the mean of the response variable and hence the canonical parameter, is the proper way to finding these values. The variance of that random variable can be computed from the second derivative of the log-likelihood:
     
     \begin{equation}
         \frac{\partial^2 l }{\partial^2 \theta} = -{b}''(\theta)/a(\phi)
     \end{equation}
     
-    \cite{gamBook} states that re-arranging this formula yields the equation for the variance of $Y$.
+    \cite{gamBook} states that re-arranging this formula yields the equation for the variance of $Y$:
     
     \begin{equation}
         var(Y) = {b}''(\theta) a(\phi)
     \end{equation}
     
-    A very important feature of GLMs is that the variance can vary. To account for varying variance the variance is divided by a weight $w$ that penalizes data points with high relative variance.
+    A very important feature of GLMs is that the variance can vary. To account for varying variance, the variance is divided by a weight $w$ that penalizes data points with high relative variance.
     
     \begin{equation}
         var(Y) = {b}''(\theta) a(\phi)/w
     \end{equation}
     
-    For simplicity the function $V(\mu)$ is defined as $V(\mu) = {b}''(\theta)$ such that $var(Y) = V\(\mu)$.
+    For reasons of simplicity the function $V(\mu)$ is defined as $V(\mu) = {b}''(\theta)$ such that $var(Y) = V\(\mu)$.
     
-    Given vector $y$ of an observation random variable $Y$ the maximum likelihood estimation of $\beta$ is possible due to the independence of all $Y_i$. The formal notation for the MLE of the likelihood of $\beta$, $L(\beta)$ becomes
+    Given vector $y$ of an observation random variable $Y$, the maximum likelihood estimation of $\beta$ is possible due to the independence of all $Y_i$. The formal notation for the MLE of the likelihood of $\beta$, $L(\beta)$ becomes
     
     \begin{equation}
         L(\beta) \prod_{i=1}^{n} f_\theta_i (y_i)
     \end{equation}
     
-    Given the previously stated the probability mass function for exponential family members the log likelihood $l()$ of $\beta$ can be written as:
+    Given the previously stated probability mass function for exponential family members, the log likelihood $l()$ of $\beta$ can be written as:
     
     \begin{equation}
         l(\beta) = \sum_{i=1}^{n} log[f_\theta_i(y_i))] = \sum_{i=1}^{n} (y_i\theta_i-b_i(\theta_i)) /a_i(\phi)+c_i(y_i, \phi)
     \end{equation}
     
-    The log function transforms the product to a sum. $\phi$ is assumed to be constant for all $i$ and \cite{gamBook} states that only choices for $\phi$ are relevant that can be stated as $a_i(\phi) = \phi / w_i$ with $w_i$ being a constant. This assumption allows us the rewrite the previous formula as
+    The log function transforms the product to a sum. $\phi$ is assumed to be constant for all $i$. \cite{gamBook} states that the only relevant choices for $\phi$ are ones that can be stated as $a_i(\phi) = \phi / w_i$ with $w_i$ being a constant. This assumption allows us the rewrite the previous formula as
     
     \begin{equation}
         l(\beta) = \sum_{i=1}^{n}\ w_i(y_i\theta_i-b_i(\theta_i)\)/a_i(\phi)+c_i(y_i, \phi)
@@ -415,13 +415,13 @@
      \sum_{i=1}^{n} w_i \begin{pmatrix} y_i \frac{\partial \theta_i }{\partial \beta_j} - {b}'(\theta_i) \frac{\partial \theta_i }{\partial \beta_j} \end{pmatrix}
     \end{equation}
     
-    \cite{gamBook} details that applying the chain rule,  $E(Y) = {b}'(\theta)$ and term substitution the following form can be produced:
+    \cite{gamBook} details that by applying the chain rule,  $E(Y) = {b}'(\theta)$ and term substitution, the following form can be produced:
     
     \begin{equation}
         \frac{\partial l }{\partial \beta_j} = \frac{1}{\phi} \sum_{i=1}^{n} \frac{[y_i - {b_i}'(\theta_i)]}{b''_i(\theta_i)/w_i} \frac{\partial \mu_i }{\partial \beta_j}
     \end{equation}
     
-    Applying the framework developed above to determine variance and expected value the full form for the estimation of $\beta$ can be stated as:
+    By applying the framework developed above to determine variance and expected value, the full form for the estimation of $\beta$ can be stated as:
     
     \begin{equation}
          \sum_{i=1}^{n} \frac{(y_i - \mu_i)^2}{V(\mu_i)} \frac{\partial \mu_i }{\partial \beta_j} = 0 \ \forall \ j.
@@ -433,14 +433,14 @@
           S = \sum_{i=1}^{n} \frac{(y_i - \mu_i)^2}{V(\mu_i)}
       \end{equation}
     
-    In the formulation $\mu_i$ depends non-linearly on $\beta$ but the weights $V(\mu)$ are treated as fixed. To find the least squares estimated $\partial S / \partial \beta_j$ must equal to zero for all js. Formulating the search for $\beta$ as finding the optimal choice of distribution parameters of $Y$ invites an iterative approach that chooses some parameter values and e .
+    In the formulation, $\mu_i$ depends non-linearly on $\beta$ but the weights $V(\mu)$ are treated as fixed. To find the least squares estimated, $\partial S / \partial \beta_j$ must equal to zero for all js. Formulating the search for $\beta$ as finding the optimal choice of distribution parameters of $Y$ invites an iterative approach that chooses some parameter values and successively adjusts these.
     
     \subsubsection{Iterative Reweighted Least Squares}
-    \cite{gamBook} describes this process formally to introduce the iterative reweighted least squares algorithm. Let $\widehat{\beta}^{[k]}$ be the estimated parameter vector at the $k^{th}$ iteration. $\eta^{[k]}$ is a vector with the elements $\eta^{[k]}=X_i \widehat{\beta}^{[k]}$ and $\mu_{i}^{[k]}}$ is defined as inverse of the link function. $\mu_{i}^{[k]} = g^{-1}(\eta_{i}^{[k]}$. Given these definitions the algorithm can be stated.
+    IRLS is the generalized method to estimate distribution parameters for any exponential family. The computational method described in this section seeks to estimate distributing parameters by minimizing the distance of expected value to expected value given a current estimate of distribution parameters. \cite{gamBook} formally describes the process as: Let $\widehat{\beta}^{[k]}$ be the estimated parameter vector at the $k^{th}$ iteration. $\eta^{[k]}$ is a vector with the elements $\eta^{[k]}=X_i \widehat{\beta}^{[k]}$ and $\mu_{i}^{[k]}}$ is defined as the inverse of the link function. $\mu_{i}^{[k]} = g^{-1}(\eta_{i}^{[k]}$. Given these definitions, the IRLS algorithm can be stated:
     
     \begin{enumerate}
-   \item Compute the variance weighted variance $V(\mu_{i}^{[k]})$ terms implied by the current estimate for $\widehat{\beta}^{[k]}$
-   \item Use these estimates and apply the method describe to minimize the least square objective with respect to $\beta$ to obtain $\widehat{\beta}^{[k]}$
+   \item Compute the weighted variance $V(\mu_{i}^{[k]})$ terms implied by the current estimate for $\widehat{\beta}^{[k]}$
+   \item Use these estimates and apply the method described to minimize the least squares objective with respect to $\beta$ to obtain $\widehat{\beta}^{[k]}$
    \item Set k to k+1
    \end{enumerate}
     
@@ -450,7 +450,7 @@
         S = \left \| \sqrt{W}^{[k]}  \left ( z^{[k]} - X\beta \right )  \right \|^2
     \end{equation}
     
-    Where $z^{[k]$ is so called "pseudodata" and $W}^{[k]]$  the diagonal weight matrix, each defined as
+    Where $z^{[k]$ is the so called "pseudo data" and $W}^{[k]]$ is the diagonal weight matrix, each defined as
     
     \begin{equation}
         z_{i}^{[k]} = {g}'(\mu^{[k]})(y_i - \mu_i^{[k]} + \eta_i^{[k]}
@@ -460,18 +460,20 @@
         W_{ii}^{[k]} = \frac{1} { V(\mu_{i}^{[k]}) \mu_{i}^{[k]}}
     \end{equation}
 
-    With these definition we can finally write the full form of the practically used IRLS.
+    With these definitions we can finally write the full form of the practically used IRLS.
     \begin{enumerate}
-        \item Use current $\eta^{[k]}$ and $\mu^{[k]}$ to calculate calculate pseudo data $z^{[k]}$ and iterative weights for the weights matrix $W^{[k]}$
+        \item Use current $\eta^{[k]}$ and $\mu^{[k]}$ to calculate pseudo data $z^{[k]}$ and iterative weights for the weights matrix $W^{[k]}$
         \item Minimize the least squares objective $\left \| \sqrt{W}^{[k]}  \left ( z^{[k]} - X\beta \right )  \right \|^2$ w.r.t. $\beta$ to obtain  $\widehat{\beta}^{[k+1]}$ and the resulting $\eta^{[k+1]}=X_i \widehat{\beta}^{[k+1]}$ and $\mu_{i}^{[k+1]}}$
         \item Set k to k + 1 
     \end{enumerate}
         
-        The proposed method will converge on the optimal parameter vector $\widehat{\beta}$
-        \subsubsection{Generalized Linear Model Example}
+         The proposed method is an iterative method that produces a vector of pseudo data $z$ with the current parameter estimated $\widehat{\beta}$ multiplied with the model matrix $X$ and the expected value of $Y_i$. The distance between the pseudo data vector and the model matrix multiplied by the weight is then minimized to produce a new set of estimates. \cite{glm} have shown that the introduced method will converge on the optimal parameter vector $\widehat{\beta}$. 
+        
+        
+    \subsubsection{Generalized Linear Model Example}
     
     \section{Generalized Additive Models}  \label{gam}
-    Generalized additive model (GAM) allow predictor variables of GLM to be estimated with non-parametric methods. GAM has the interpretability advantages of GLMs where the contribution of each predictor variable to the function is clearly encoded. However, it has substantially more flexibility because the relationships between predictor and response variable are not assumed to be linear. GAMs assume the relationship between predictor in response variable to be the sum of functions. These functions are regularized by enforcing a smooth patter. These smooth functions can be estimated with a scatter plot smoother. \cite{gam} introduced GAMs and described many approaches to scatter plot smoothing. For practicability and applicability this thesis will focus on regression splines, especially cubic splines and cyclic cubic splines. \cite{gamBook} formally describe GAMs as:
+    Generalized additive model (GAM) allow predictor variables of GLM to be estimated with non-parametric methods. GAM has the interpretability advantages of GLMs where the contribution of each predictor variable to the function is clearly encoded. However, it has substantially more flexibility because the relationships between predictor and response variable are not assumed to be linear. GAMs assume the relationship between predictor in response variable to be the sum of functions. These functions are regularized by penalizing the second derivative. Because the acceleration of the functions are penalized they are commonly referred to as smoothing functions. Hastie introduced GAMs and described many approaches to estimate the smooth functions \cite{gam}. Modern approaches have highlighted the use of regression splines for smooth functions estimation \cite{gamBook}. Woods states the smooth function can best be represented as regression splines. This thesis focuses focus on representing the unknown smooth function via regression splines. The implementation will only feature cubic splines and cyclic cubic splines. \cite{gamBook} formally describe GAMs as:
     
     \begin{equation}
         g(\mu_i) = X_i^* \theta + f_1(x_1i) + f_2(x_2i) + ... + f_3(x_3i)
@@ -486,13 +488,13 @@
         y_i = f(x_i) + \epsilon_i
     \end{equation}
     
-    Bootstraping the methods used for fitting a simple linear model we assume the the function $f$ to be linear in $x_i$. This assumption is guarantees that the function can be found with linear parametric methods. \cite{gamBook} proposes to choose a basis function to represent function $f$. The basis function allows to represent the function $f$ as a combination of a basis function and a parameter vector $\beta$. The function $f$ can thus be written as:
+    Bootstraping the methods used for fitting a simple linear model we assume the the function $f$ to be linear in $x_i$. This assumption is guarantees that the function can be found with linear parametric methods. Basis functions are a reasonable approach to estimate the function $f$ \cite{gamBook}. The basis function allows to represent the function $f$ as a combination of a basis function and a parameter vector $\beta$. The function $f$ can thus be written as:
     
     \begin{equation}
         f(x) = \sum_{i=1}^{q} b_i(x)\beta_i
     \end{equation}
 
-    The function is $f$ is represented as the sum of basis functions times the parameter vector. The sum goes up the basis dimension which is determined by the basis. The influence of the $\beta$ is linear combination, satisfying the linearity condition.\cite{hastie} states that the basis over the entire range of the data would amount to a polynomial regression. Polynomial regression can be useful but suffer from instability at the edges and insufficient for interpolation. The suitable alternative is splines estimation. Splines divide the the unknown function into sections. Each section is then fit with an individual polynomial. Each piecewise polynomial is required to be continuous at the intersection with the adjacent piecewise polynomial. Basis splines find the piecewise polynomial through a linear combination of function basis and parameters $\beta$. This approach gives enough flexibility while satisfying the linearity constraint.
+    The function is $f$ is represented as the sum of basis functions times the parameter vector. The sum goes up the basis dimension which is determined by the chosen basis. The influence of the $\beta$ is linear combination, satisfying the linearity condition.\cite{hastie} states that the basis over the entire range of the data would amount to a polynomial regression. Polynomial regression can be useful but suffer from instability at the edges and insufficient for interpolation. The suitable alternative is splines estimation. Splines divide the the unknown function into sections. Each section is then fit with an individual polynomial. Each piecewise polynomial is required to be continuous at the intersection with the adjacent piecewise polynomial. Basis splines find the piecewise polynomial through a linear combination of function basis and parameters $\beta$. This approach gives enough flexibility while satisfying the linearity constraint.
     
     \subsection{Basis Splines}
     Splines constitute an ideal method for the nonparametric estimation of any unknown function. Basis splines (B-Splines) are of particular interest since they are very easy to set up satisfy in the linearity condition. Their linear nature allows to fit them via the simple model from sections 1. B-Splines consists of two parts: the knots and the functions. A B-spline of order n is a piecewise polynomial function of degree $< n$ in a variable x. Each polynomial is of degree $<n$ \cite{splines} states that B-splines are defined by their order m and number of interior knots N. There are two endpoints which are themselves knots so the total number of knots will be $N + 2$ . The degree of the B-spline polynomial will be the spline order m minus one. The degree n of a B-Splines is thus $m-1$. The knots are formally described as a vector in non-descending order with N interior knots and knots at the endpoints.
