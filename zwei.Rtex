@@ -34,13 +34,13 @@
 
 
 \title{
-    Fitting Generalized Additive Models for\\ very large data sets with Apache Spark \\ or \\ 
-    Fitting Generalized Additive Models with Apache Spark\\ or \\
-    Fitting Generalized Addittve Models for very large data sets
+    Generalized Additive Models for\\ very large data sets with Apache Spark \\ or \\ 
+    Generalized Additive Models with Apache Spark\\ or \\
+    Generalized Additive Models for very large data sets
     \\[7pt]
     \large Chapter Excerpt
 }
-\date{Future}
+\date{05/06/2016}
 \author{Kai Thomas Brusch}
 
 \begin{document}
@@ -51,7 +51,7 @@
 
     \paragraph{Summary}
 
-    This document contains three introductory chapters for my bachelor thesis titled "Fitting General Additive Models for very large datasets with Apache Spark".
+    This document contains the first chapters for my bachelor thesis titled "Generalized Additive Models for very large data sets with Apache Spark" and an outlook for the coming chapters.
 
     \paragraph{Contact} \texttt{kai.brusch@gmail.com}
 
@@ -71,9 +71,9 @@
     
     \epigraph{Statistics is the the grammar of science}{\textit{Karl Pearson}}
 
-    Karl Pearson, the father of applied statistics famously described statistics as the grammar of science. Leveraging data as a method of inquiry has become the maxim of modern scientific thought. Hypothesis testing, statistical modeling and measurement are areas in which statistics are essential to every quantitative science. "The coming century is surely the century of data" David Donoho recognizes the 21th century as the century of data and statistics. The ever growing ability to store and process data has facilitated a quantum leap in science, technology and business. Consumer electronics and the modern Internet have generated more data in the past two years than in the prior 2000 years. Modern statistics has developed sophisticated models to discover and explain hidden patterns in data. The glut of data and the complexity of statistical models have placed the computer at the heart of statistics. Advances in computing have bridged the gap between large data sets and statistical inquiry. Cloud computing frameworks allow statistical models to process gigabytes of data. This thesis focuses on a statistical model called generalized additive model ("GAM"). \cite{gam} describes the GAM as the compromise of interpretable and flexible models. The GAM provides the interpretability of traditional linear models but allows for flexible estimation of some variables. 
+    Karl Pearson, the father of applied statistics famously described statistics as the grammar of science. Leveraging data as a method of inquiry has become the maxim of modern scientific thought. Hypothesis testing, statistical modeling and measurement are areas in which statistics are essential to every quantitative science. "The coming century is surely the century of data" David Donoho recognizes the 21th century as the century of data and statistics. The advent of modern, large-scale computing has placed the computer at the heart of modern statistics. The ever growing ability to process and  store data has facilitated a quantum leap in science, technology and business. Consumer electronics and the modern Internet have generated more data in the past two years than in the prior 2000 years. Modern statistics has developed sophisticated models to discover and explain hidden patterns in data. Advances in computing have bridged the gap between large data sets and statistical inquiry. Cluster computing frameworks allow statistical models to process gigabytes of data. This thesis focuses on a statistical model called generalized additive model ("GAM"). \cite{gam} describes the GAM as the compromise of interpretable and flexible models. The GAM provides the interpretability of traditional linear models but allows for flexible estimation of some variables. 
     
-    GAMs and much of modern statistical research is published in the programming language R. \cite{gamBook} implemented an optimized version of the GAM in an R packaged called Mixed GAM computation Vehicle ("mgcv"). R was written by statisticians and is the lingua fracta for statistical research. However, R is not designed for parallelization and cluster computing. Apache Spark ("Spark") has emerged as the most prominent general purpose cluster computing frame work. The ability to perform distributed, in-memory computation while preserving a high level of abstraction makes Spark a popular cluster computing framework. The distributed nature of Spark allows the performance of iterative operations on large data sets while maintaining the data in-memory. Spark appears to be an ideal computation environment for GAMs, because GAMs are estimated by a highly iterative process. Exploring the advantages of using Spark rather than R for GAM estimation is the goal of this thesis. 
+    GAMs and much of modern statistical research is published in the programming language R. \cite{gamBook} implemented an optimized version of the GAM in an R packaged called Mixed GAM computation Vehicle ("mgcv"). R was written by statisticians and has become the lingua fracta for statistical research. R has recently surpassed Stata as the most popular statistical programming language. However, R is not designed for parallelization and cluster computing. Apache Spark ("Spark") has emerged as the most prominent general purpose cluster computing frame work. The ability to perform distributed, in-memory computation while preserving a high level of abstraction makes Spark a popular cluster computing framework. The distributed nature of Spark allows the performance of iterative operations on large data sets while maintaining the data in-memory. Spark appears to be an ideal computation environment for GAMs, because GAMs are estimated by a highly iterative process. Exploring the advantages of using Spark rather than R for GAM estimation is the goal of this thesis. 
     
     This thesis comprises \ref{end} sections. The goal of the first three sections is to introduce the GAM by explaining its components in order of increased complexity. Starting with the framework of statistical learning and the linear model followed by the generalized linear model and finishing with the GAM. Sections 5 details the implementation of GAMs in Spark and includes a language comparison of Spark and R. The final two sections evaluate the implementation by way of comparison and conclude with a discussion on future work.
     
@@ -81,7 +81,7 @@
     
         \section{Statistical Learning} \label{statlearn}
      
-    Statistical learning is a set of tools for modeling and understanding complex data sets. Recent developments in statistics and computer science have created an interesting field that empowers modern statistical methods with computational ones. Statistical learning provides a  framework for asking and answering questions by using data. This thesis will focus on the generalized additive model, a method of the supervised learning branch of statistical learning. Supervised learning methods provide models for prediction and inference. They provide a framework for explaining response variables in terms of predictor variables. Statistical learning methods are essential for modern scientific research and have empowered many other branches of quantitative sciences. The practical application of these methods in the corporate world has coined the term Data Science.
+    Statistical learning is a set of tools for modeling and understanding complex data sets. Recent developments in statistics and computer science have created an interesting field that empowers modern statistical methods with computational methods. Statistical learning provides a  framework for asking and answering questions by using data. This thesis will focus on the generalized additive model, a method of the supervised learning branch of statistical learning. Supervised learning methods provide models for prediction and inference. They provide a framework for explaining response variables in terms of predictor variables. Statistical learning methods are essential for modern scientific research and have empowered many other branches of quantitative sciences. The practical application of these methods in the corporate world has coined the term Data Science.
     
     \subsection{Introduction to Statistical Learning}
     
@@ -95,7 +95,7 @@
             
         \end{figure}
         
-    The applied method can generalized by the following question: Given a data set with observations of a quantitative response $Y$ and several predictors $X_1, X_2 , ... X_i$, what is the underlying, unknown relationship $f()$? $f()$ explains $Y$ in terms of $X$. This can be formally stated as
+    The applied method can generalized to answer the following question: Given a data set with observations of a quantitative response $Y$ and several predictors $X_1, X_2 , ... X_i$, what is the underlying, unknown relationship $f()$? $f()$ explains $Y$ in terms of $X$. This can be formally stated as
     \begin{equation}
         Y = f(X) + \epsilon
     \end{equation}
@@ -111,7 +111,7 @@
         \widehat{Y} = \widehat{f}(X)
     \end{equation}
     
-    The wide hat notation stands for an approximated value. $\widehat{f}$ is the estimated function for the true, unknown relationship $f()$ and $\widehat{Y}$ is an estimation of $Y$. The accuracy of our predicted $\widehat{Y}$ depends on two quantities: the reducible error and the irreducible error. The reducible error yields from the approximating nature of $\widehat{f()}$. The choice of $\widehat{f}$ directly causes the reducible error. A different approximation can influence the reducible error. However, some of the error will always be unexplained and is inherent in the measurements taken. This implicit error in our measurement can not be reduced and is thus called the irreducible error. \cite{hastie} formally describes the two types of error as:
+    The wide hat notation stands for an approximated value. $\widehat{f}$ is the estimated function for the true, unknown relationship $f()$ and $\widehat{Y}$ is an estimation of $Y$. The accuracy of our predicted $\widehat{Y}$ depends on two quantities: the reducible error and the irreducible error. The reducible error yields from the approximating nature of $\widehat{f()}$. The difference between $\widehat{f}()$ and $f()$ directly causes the reducible error. A different approximation can influence the reducible error. However, some of the error will always be unexplained and is inherent in the measurements taken. This implicit error in our measurement can not be reduced and is thus called the irreducible error. \cite{hastie} formally describes the two types of error as:
     \begin{equation}
         E(Y-\widehat{Y}) = E[f(X)+\epsilon - \widehat{f}(X)]^2 = [f(X)-\widehat{f}(X)] + Var(\epsilon)
     \end{equation}
@@ -131,7 +131,7 @@
         f(X) = \beta_0 + \beta_1 X_1 + ... + \beta_p X_p
     \end{equation}
     
-    The function $f$ is linear in the influence of the parameters $\beta$. The linear assumption poses tight restrictions on the shape of $f$ but also on search space of potential functions. A non-parametric function requires searching in an arbitrary p-dimensional function space. However, the linear assumption limits the search space to p+1 coefficients.
+    The function $f$ is linear in the influence of the parameters $\beta$. The linear assumption poses tight restrictions on the shape of $f$ but also on search space of potential functions. A non-parametric function requires searching in an infinite-dimensional function space. However, the linear assumption limits the search space to p+1 coefficients.
     
     After deciding on a shape for $f$ the function needs to be estimated. The process of actually finding $f$ is also referred to as training or fitting a function. In this example fitting amounts to finding the coefficients $\beta_0,\beta_1, ... ,\beta_p$. Therefore the full problem of fitting a linear model is:
     
@@ -140,11 +140,11 @@
     \end{equation}
     
     
-    The shape decided in step one does not dictate a specific method of finding the coefficients, however there are certain methods commonly associated with particular shapes. The linear assumption in this example is usually fit with a least squares method, which can be computed with different methods. The choice of a parametric form solely dictates the position and number of the parameters involved, thus the name: parametric.
+    The shape decided in step one does not dictate a specific method of finding the coefficients, however there are certain methods  associated with particular functional share and error distribution. The linear model assumes an Gaussian distributed error term and can be estimated by the least squares method. Least squares is the simples estimation method and introduced in the next section. The choice of a parametric form solely dictates the position and number of the parameters involved, thus the name: parametric.
     
-    Choosing a functional shape for $f()$ drastically simplifies the fitting process by predetermining the amount of coefficients to be estimated. However, the chosen shape may enforce conditions that are very different to the original function $f$. A poor choice of the parametric form leads to a poor estimate. This problem can be addressed with more flexible methods that allow for more parameters. A higher number of parameters, however, bears the associated risk of over fitting the data. Over fitting estimates a function too close the original data points, possibly omitting important systemic information. A major benefit of parametric methods is the ability to interpret the results. A functional shape is usually determined by factors outside of the data set. As the choice of shape enforces a certain model, the result will be within the shape and is therefore interpretable through the model.
+    Choosing a functional shape for $f()$ drastically simplifies the fitting process by predetermining the amount of coefficients to be estimated. However, the chosen shape may enforce conditions that are very different to the actual function $f$. A poor choice of the parametric form leads to a poor estimate. This problem can be addressed with more flexible methods that allow for more parameters. A higher number of parameters, however, bears the associated risk of over fitting the data. Over fitting estimates a function too close the original data points, possibly omitting important systemic information. A major benefit of parametric methods is the ability to interpret the results. A functional shape is usually determined by factors outside of the data set. The choice of parametric shape will represent the estimated coefficients in meaningful way. Thus the choice of shape enforces a certain model in which the coefficients are to be interpreted. 
     
-    The non-parametric approach is the complement of the parametric one \cite{hastie}. Non-parametric methods, such as regression splines, do not assume the functional form of $f$ before estimating it. This brings a major advantage over parametric methods since they allows $f$ to follow the data as closely as possible without the influence of a predetermined shape. Allowing $f$ to take any arbitrary form offers much more flexibility then parametric methods. While non-parametric methods avoid the pitfall of a bad functional shape, they have to search the whole possible space of f. Searching an arbitrary functional space is very time- and space-intensive. Non-parametric methods provide much more flexibility than parametric methods and are usually preferred for prediction. However, their results' arbitrary shape makes the interpretation of the result harder to understand.
+    The non-parametric approach is the complement of the parametric one \cite{hastie}. Non-parametric methods, such as regression splines, do not assume the functional form of $f$ before estimating it. This brings a major advantage over parametric methods since they allows $f$ to follow the data as closely as possible without the influence of a predetermined shape. Allowing $f$ to take any arbitrary form offers much more flexibility then parametric methods. While non-parametric methods avoid the pitfall of a bad functional shape, they have to search the whole possible space of f. Searching an arbitrary functional space is very time- and space-intensive and suffer from over-fitting. Non-parametric methods provide much more flexibility than parametric methods and are powerful for certain predictions. Non-parametric methods excel at interpolating, predicting new cases within the training sets' range.  However, their results' arbitrary shape makes the interpretation of the result harder to understand and they struggle with predictions outside the trainings sets' range.
     
     The GAM constitutes an interesting collation of parametric as well as non-parametric elements: it leverages non-parametric estimation of some variables of a parametric method. It uses regression splines estimation to estimate arbitrary functions for some variables of a generalized linear model. 
     
@@ -155,22 +155,28 @@
     R is a free software environment for statistical computing and graphics. R is designed to express statistical models and comes with an development environment that is built to illustrate and discover data. R is widely recognized as language for statistical research. This thesis uses R to express statistical concepts and examples. This section introduces relevant syntax for matrix manipulation in R:
     
   <<chunk1>>=
-    # A vector is the essential data type in R
-    y = c(1,2,3,4,5)
-    
+    # A vector is the atomic unit in R
+    y = 2
+
     # Indexes start at 1
     y[1]
-    
+
+    # Data structures are mutable
+    y <- c(y,y,y,y,y)
+
     # Create a matrix with n rows m columns filled with random values
     n = 5
     m = 3
     X = matrix(runif(15),n,m)
-    
+
     # A linear model to explain y in terms of X
     mod <- lm(y ~ X)
-    
+
     # Return the coefficients of the model
     coef(mod)
+
+    # Matrix multiplication of the mode matrix and the coefficients
+    X%*%coef(mod)[2:4]
     @
         
     
@@ -184,10 +190,10 @@
         The simple linear model (or linear regression), explains the response variable as the linear combination of a predictor variable and the estimated coefficients. It is the simplest linear model and explains a normal distributed response variable in terms of one explanatory variable. \cite{gamBook} describes the theory for a linear model with one explanatory variable as follows: Given $n$ observations of $x_i$ and $y_i$ where $y_i$ is the observations of a random variable $Y_i$ with expectation $\mu_i \equiv E(Y_i)$, a linear model has the following parametric form:
         
         \begin{equation}
-            Y_i = x_i \beta + \epsilon_i \ where \mu_i = x_i \beta
+            Y_i = x_i \beta + \epsilon_i \ where \ \mu_i = x_i \beta
         \end{equation}
       
-        $\epsilon_i$ is the error term for that row and the estimated parameter $\beta$ that. A linear model assumes that $\epsilon_i$ are mutually independent zero mean random variables with variance $\sigma^2$. The linear model explains the response variable $Y$ in terms of a predictor variable $x$  multiplied by an estimated coefficient $\beta$ plus a random error term $\epsilon$. 
+        The key assumption for the linear model is that $\epsilon_i$ is a Gaussian distributed error term and independent variance of x and y. A linear model assumes that $\epsilon_i$ are mutually independent zero mean random variables with variance $\sigma^2$. The linear model explains the response variable $Y$ in terms of a predictor variable $x$  multiplied by an estimated coefficient $\beta$ plus a random error term $\epsilon$. 
         
         \begin{figure}[h]
             \centering
@@ -197,7 +203,7 @@
         \end{figure}
         
         
-        $y_i$ and $x_i$ are known but $\beta$ is unknown and thus needs to be estimated. The simple model linear model gives one approach to estimate $\beta$ from the given data $x_i$,$y_i$. The simple linear model seeks to find the $\beta$ that minimizes the squared difference between $y_i$ and $x_i$. Formalizing this notion leads to the definition of the least squares measure $S$:
+        $y_i$ and $x_i$ are known but $\beta$ is unknown and thus needs to be estimated. The simple linear model gives one approach to estimate $\beta$ from the given data $x_i$,$y_i$. The simple linear model seeks to find the $\beta$ that minimizes the squared difference between $y_i$ and $x_i$. Formalizing this notion leads to the definition of the least squares measure $S$:
         
         \begin{equation} 
         \mathbf{S} =  \sum_{i=1}^{n}(y\textsubscript{i} - x\textsubscript{i}\beta)^{2} = \sum_{i=1}^{n}(y\textsubscript{i} - \mu\textsubscript{i})^{2} 
@@ -232,7 +238,7 @@
         \end{align*}     
         \end{equation}
         
-        For the linear model this system of equations must now be rewritten in matrix form resulting in the matrix-vector form.  The matrix-vector form for the simple linear model takes the following shape: 
+        For the linear model this system of equations can be rewritten in a matrix-vector form. This form allows to phrase the estimation process as finding a solution to an over-determined system of equations. Finding this solution is mathematically well established and highly optimized. The matrix-vector form for the simple linear model takes the following shape: 
         \begin{equation}
        \left[ \begin{array}{c} \mu_1 \\ \mu_2 \\ \mu_3 \\ ... \\  \mu_n\end{array} \right] = \begin{bmatrix} 1 & x_1 \\ 1 & x_2 \\ 1 & x_3 \\ ... \\1 & x_n   \end{bmatrix}  \left[ \begin{array}{c} \beta_0 \\ \beta_1 \end{array} \right]   
         \end{equation}
@@ -243,7 +249,26 @@
            \left[ \begin{array}{c} \mu_1 \\ \mu_2 \\ \mu_3 \\ ... \\  \mu_n\end{array} \right] = \begin{bmatrix} 1 & x_1 & x_2\\ 1 & x_2 & x_2 \\ 1 & x_3 & x_3 \\ ... \\1 & x_n & x_n   \end{bmatrix}  \left[ \begin{array}{c} \beta_0 \\ \beta_1 \\ \beta_2 \end{array} \right]   
         \end{equation}
     
-        The matrix-vector form yields the general form of the linear model $\mu = X\beta$. This means that the value vector $\mu$ is given by the model matrix $X$ multiplied by the unknown parameter vector $\beta$. The model matrix can account for an arbitrary amount of predictor variables by adding a column for each predictor. Continuous and discrete predictor variables require special encoding in the model matrix. Dummy and factor encoding are the two approaches for factor variables. For a detailed explanation on factor encoding in linear models see \cite{regression}. The model matrix is also known as a design matrix and the terms are used interchangeably. $\mu = X\beta$ is the canonical form of a linear model. The method for estimating $\beta$ for one predictor does not work for the matrix-vector form and requires adjustment for estimating the unknown vector $\beta$. 
+        The matrix-vector form yields the general form of the linear model $\mu = X\beta$. This means that the value vector $\mu$ is given by the model matrix $X$ multiplied by the unknown parameter vector $\beta$. The model matrix can account for an arbitrary amount of predictor variables by adding a column for each predictor. This formulation assumes numerical predictor variables. Numerical predictor variables can be either continuous or discrete. Continuous predictor variables are usually measurement without a clear boundaries between values, a classic example is measurement of length. Since there are arbitrary many values between 1 meter and 2 meters, i.e. 1.1, 1.01, 1.001 they are called continuous. Discrete values have a clean border between two values. The count of occurrences is an example of a discrete variable.  Categorical var  variables require special encoding in the model matrix. Dummy and factor encoding are the two approaches for factor variables. For a detailed explanation on factor encoding in linear models see \cite{regression}. The model matrix is also known as a design matrix and the terms are used interchangeably. $\mu = X\beta$ is the canonical form of a linear model. Algebraically the method for estimating $\beta$ for one predictor and estimating the unknown vector $\beta$ are very similar. However, stable and efficient numerical solution for the matrix-vector form require adjustments. The modern approach to estimation is maximum-likelihood estimation. 
+        
+        \subsubsection{Maximum-Likelihood Estimation}
+        Maximum-likelihood estimation ('MLE') provides a single framework for estimating linear models, generalized linear models and generalized additive models. Unlike probability, likelihood is used after data is available to describe a function of a parameter vector for a given outcome. \cite{glm} describes the principle of maximum likelihood estimation as searching for probability distribution parameters that makes the observed data most likely. This results in a search for the parameter vector that maximizes the likelihood function $L(\beta|y)$. The parameter vector is found by searching the multi-dimensional parameter space.
+
+        \cite{MLE} describes MLE as finding the parameters for a distribution that were most likely to produce the given data. Random variables are defined in terms of one or several parameters. Usually the distribution parameters are the observed variance and mean. The Poisson, for example, assumes mean $=$ variance and thus only requires one parameter $P(\lambda)$. The gamma distribution is defined in terms of shape $k$ and scale $\theta$  $G(K,\theta)$ two. Maximum likelihood estimation provides a single framework to allow parameter estimation for any of the exponential family distributions \cite{glm}.  
+
+        From a statistical analysis point of view the vector $y$ of observed data is a random sample from an unknown population. The goal of maximum likelihood estimation is to find the parameters of the given distribution that most likely  produced this sample. This process is described with a probability density function (PDF) $f()$ of observed data $y$ given a parameter $\beta$: $f(y|\beta)$. If individual observations, $y_i$’s, are statistically independent of one another, the PDF for the data $y$, given the parameter vector $\beta$, can be expressed as a multiplication of PDFs for individual observations.
+    
+        \begin{equation} f(y|\beta) = f((y_1, y_2,...,y_n) | (\beta_1,\beta_2, ... \beta_n )) = \prod_{i=1}^{n} f_i(y_i|\beta_i) ) \label{} \end{equation}
+    
+        Given a set of parameter values, the corresponding PDF will show that some data are more probable than other data. However, the data is already given and the search is for the parameters of the distribution that most likely produced the data. Thus the conditional probability is reversed. From $f(y|\beta)$ to $L(\beta|y)$ produces the likelihood of $y$ given the parameters $\beta$. For computational convenience, the MLE is obtained by maximizing the log-likelihood function, $ln(L(\beta|y))$. This is because the two functions, $ln(L(\beta|y))$ and $L(w|y)$ are monotonically related to each other. Consequently the same MLE estimate is obtained by maximizing either one. However, the log-likelihood is prerred because it transforms the product into a sum. Assuming that the log-likelihood function $ln(L(\beta|y))$ is differentiable, if $\beta$ exists, it must satisfy the following partial differential equation known as the likelihood equation:
+    
+        \begin{equation} \frac{\partial ln L(\beta|y)}{\partial \beta_i} = 0 \end{equation}
+    
+        These properties are given because the definition of the maximum or minimum of a continuous differentiable function implies that its first derivatives vanish at such points. The likelihood equation represents a necessary condition for the existence of an MLE estimate. An additional condition must also be satisfied to ensure that $ln(L(\beta|y))$ is a maximum and not a minimum, since the first derivative cannot reveal this. The log-likelihood must be convex near w. This is verified by calculating the second derivatives of the log-likelihoods and checking if they are negative.
+    
+        \begin{equation} \frac{\partial^2 ln L(\beta|y)}{\partial \beta^2_i} < 0 \end{equation}
+    
+        This form is only of theoretical value as practical models often involve many parameters and have highly non-linear PDFs. Thus the estimate must be sought numerically using non-linear optimization methods. The basic idea for these methods is to find optimal parameters that maximize the log-likelihood focusing on smaller sub-sets of the multi-dimensional parameter space. This is the preferred approach because exhaustively searching the whole parameter space becomes intractable with an increasing amount of parameters. The practical method for MLE searches by trial and error over the course of a series of iterative steps. Each iteration changes the results from the previous iteration by a small value. The choice of the value is tailored to improve the log-likelihood. GLM are fit by a method called iterative re-weighted least squares and is subject of the next section.
         
         \subsubsection{Estimating Linear Models}
         \cite{gamBook} describes the estimation process for unknown parameter vectors as finding the least squares solution to $\beta$. The computationally stablest and fastest method involves QR-decomposing the model matrix to express $\widehat{\beta}$ in terms of the upper triangular matrix. This method is widely used in statistical packages and is relevant for the numerically optimized version of the GAM. This approach involves starts with the linear model in the full matrix-vector form:
@@ -252,7 +277,7 @@
              \mu = X \beta, y \approx N(\mu, I_n, \sigma^2)
          \end{equation}
         
-        The model matrix $X$ is a matrix with n rows and p columns. With n being the number of observations and p is a product of predictors and their encoding. The least squares estimation for $\beta$ is the best linear unbiased estimator with least variance, \cite{gamBook} provides a full proof. Estimating $\beta$ relies on the minimizing the Euclidean length of a vector. The Euclidean length of a vector is the sum squared of its elements. For a vector v in n dimensional space the Euclidean length is defined as:
+        The model matrix $X$ is a matrix with n rows and p columns. With n being the number of observations and p is a product of predictors and their encoding. Estimating $\beta$ relies on the minimizing the Euclidean length of a vector. The Euclidean length of a vector is the sum squared of its elements. For a vector v in n dimensional space the Euclidean length is defined as:
         
         \begin{equation}
             \left \| v \right \|^2 \equiv v^T v \equiv \sum_{n}^{i=1} v^2
@@ -261,7 +286,7 @@
         An essential fact about the Euclidean length is that the rotation of a matrix does not change its length. This property can be used to estimate $\beta$ from a rotated orthogonal matrix. This also applies to the rotation of $y-X\beta$. Bootstrapping the Euclidean length to define our measure $S$ in the matrix-vector framework yields
         
         \begin{equation}
-           \label{S} S =  \left \| y - \mu \right \|^2 = \| y = X\beta \|^2 
+           \label{S} S =  \left \| y - \mu \right \|^2 = \| y - X\beta \|^2 
         \end{equation}
         
         The QR-decomposition of a matrix is computational stables approach to method for estimating $\beta$ \cite{gamBook}. Any real matrix X can be decomposed into an orthogonal matrix and triangular matrix.
@@ -313,25 +338,7 @@
 
     The GLM models the link function $g()$ of the expected value $\mu_i$ as the linear combination of the model matrix $X$ and the estimated coefficients $\beta$. $X_i$ is the $i^th$ row of a model matrix X and $\beta$ is a vector of unknown parameters. The GLM models the expected value of the random variable $Y$ with $\mu_i \equiv E(Y_i)$. $Y_i$ is assumed to be distributed according to some exponential family. Every exponential family distribution has a canonical link function $g()$. The link function transfers the exponential functions into linear space and each exponential distribution comes with a canonical link function. The canonical link function transforms the expected value into the space of the estimated coefficients. The coefficients are estimated by transforming the right side of the equation. The data is then fit in this transformed scale but the expected variance is calculated on the original scale of the predictor variables. While the least squares approach was sufficient for estimating the coefficients for a normal distributed response with zero mean error, it fails to estimate an arbitrary amount of distribution parameters required for the GLM. \cite{glm} introduces iterative re-weighted least squares ("IRLS") as a method to obtain maximum likelihood estimates ("MLE") for a particular exponential family distribution. IRLS can be interpreted as the generalization of the least squares approach from normal distribution to any exponential family distribution. A practical feature of GLMs is that they can all be fitted using IRLS, independent of response variable distribution. 
  
-    \subsubsection{Maximum-Likelihood Estimation}
     
-    \cite{glm} describes the principle of maximum likelihood estimation as searching for probability distribution parameters that makes the observed data most likely. This results in a search for the parameter vector that maximizes the likelihood function $L(\beta|y)$. The parameter vector is found by searching the multi-dimensional parameter space.
-
-    \cite{MLE} describes MLE as finding the parameters for a distribution that were most likely to produce the given data. Instead of searching for a coefficient vector that minimizes the squared distance, MLE searches for a particular distribution that most likely would have generate the data. Random variables are defined in terms of one or several parameters. A good choice of parameters results in a distribution that emulates the given data. The least squares linear model estimates the $\mu$ and $\sigma$ for $N( \mu ,\sigma^2)$ by minimizing $S$ and is a special case of the MLE, only allowing for normally distributed data. \cite{glm} introduces a method to estimate parameters for any exponential family distribution. Exponential family distributions have arbitrary numbers of parameters.  The Poisson, for example, only requires one parameter $P(\lambda)$ and the gamma distribution $G(K,\theta)$ two. Maximum likelihood estimation provides a single framework to allow parameter estimation for any of the exponential family distributions.
-
-    From a statistical analysis point of view the vector $y$ of observed data is a random sample from an unknown population. The goal of maximum likelihood estimation is to find the parameters of the given distribution that most likely  produced this sample. This process is described with a probability density function (PDF) $f()$ of observed data $y$ given a parameter $\beta$: $f(y|\beta)$. If individual observations, $y_i$’s, are statistically independent of one another, the PDF for the data $y$, given the parameter vector $\beta$, can be expressed as a multiplication of PDFs for individual observations.
-
-    \begin{equation} f(y|\beta) = f((y_1, y_2,...,y_n) | (\beta_1,\beta_2, ... \beta_n )) = \prod_{i=1}^{n} f_i(y_i|\beta_i) ) \end{equation}
-
-    Given a set of parameter values, the corresponding PDF will show that some data are more probable than other data. However, the data is already given and the search is for the parameters of the distribution that most likely produced the data. Thus the conditional probability is reversed. From $f(y|\beta)$ to $L(\beta|y)$ produces the likelihood of $y$ given the parameters $\beta$. For computational convenience, the MLE is obtained by maximizing the log-likelihood function, $ln(L(\beta|y))$. This is because the two functions, $ln(L(\beta|y))$ and $L(w|y)$ are monotonically related to each other. Consequently the same MLE estimate is obtained by maximizing either one. However, the log-likelihood is preferred for obvious reasons. Assuming that the log-likelihood function $ln(L(\beta|y))$ is differentiable, if $\beta$ exists, it must satisfy the following partial differential equation known as the likelihood equation:
-
-    \begin{equation} \frac{\partial ln L(\beta|y)}{\partial \beta_i} = 0 \end{equation}
-
-    These properties are given because the definition of the maximum or minimum of a continuous differentiable function implies that its first derivatives vanish at such points. The likelihood equation represents a necessary condition for the existence of an MLE estimate. An additional condition must also be satisfied to ensure that $ln(L(\beta|y))$ is a maximum and not a minimum, since the first derivative cannot reveal this. The log-likelihood must be convex near w. This is verified by calculating the second derivatives of the log-likelihoods and checking if they are negative.
-
-    \begin{equation} \frac{\partial^2 ln L(\beta|y)}{\partial \beta^2_i} < 0 \end{equation}
-
-    This form is only of theoretical value as practical models often involve many parameters and have highly non-linear PDFs. Thus the estimate must be sought numerically using non-linear optimization methods. The basic idea for these methods is to find optimal parameters that maximize the log-likelihood focusing on smaller sub-sets of the multi-dimensional parameter space. This is the preferred approach because exhaustively searching the whole parameter space becomes intractable with an increasing amount of parameters. The practical method for MLE searches by trial and error over the course of a series of iterative steps. Each iteration changes the results from the previous iteration by a small value. The choice of the value is tailored to improve the log-likelihood. GLM are fit by a method called iterative re-weighted least squares and is subject of the next section.
         
 \subsubsection{Fitting Generalized Linear Models}
     
@@ -582,29 +589,47 @@
         lines(xp,Xp%*%coef(mod.1))      # plot fitted spline with a line plot
      @
     
-    The resulting plot illustrates the data points of wear and size on a two-dimensional plot. The estimated  $f()$ interpolates the data points with piecewise cubic splines. The choice of basis dimensions $q = knots+2$ was arbitrary and is addressed in the new section. This section addressed how to estimate a function with the basis function, how to smooth that function is adressed in the next section.
+    The resulting plot illustrates the data points of wear and size on a two-dimensional plot. The estimated  $f()$ interpolates the data points with piecewise cubic splines. The estimated function appears to represent the relationship between wear and engine size. The choice of basis dimensions $q = knots+2$ was arbitrary and is addressed in the new section. This section addressed how to estimate a function with the basis function, how to smooth that function is addressed in the next section.
     
     \subsubsection{Penalized Cubic Splines}
     
-    Penalized cubic splines seeks to find the smoothest interpolating spline by penalizing the 'wiggliness' of a function.  \cite{gamBook} argues that the choice of basis order does not suffice to control the smoothness of the resulting spline. A different choice of basis does influence the shape of the function but does not suffice to enforce the required smoothness. The author goes on to introduce the penalized regression spline, specifically the penalized cubic spline. Penalized cubic splines use a smoothing parameter that penalizes the second derivative. The second derivative or acceleration of an interpolating function is also a proxy for over- and under fitting. If the acceleration of an interpolation function is high, the function has enough curvature to account for each data point and will over-fit. By penalizing the acceleration of an interpolating function over-fitting can be avoided. In the linear model section over-fitting has been stated as a weakness of non-parametric methods. As stated, the aim of fitting a function is to find a parameter vector $\beta$ that minimizes the following equation:
+    Penalized cubic splines seeks to find the smoothest interpolating spline by penalizing the 'wiggliness' of a function.  \cite{gamBook} argues that the choice of basis order does not suffice to control the smoothness of the resulting spline. The basis does influence the shape of the function but does not suffice to enforce the required smoothness. The author goes on to introduce the penalized regression spline, specifically the penalized cubic spline. Penalized cubic splines use a smoothing parameter that penalizes the second derivative. The second derivative or acceleration of an interpolating function is also a proxy for over- and under fitting. If the acceleration of an interpolation function is high, the function has enough curvature to account for each data point and will over-fit. By penalizing the acceleration of an interpolating function over-fitting can be avoided. In the linear model section over-fitting has been stated as a weakness of non-parametric methods. As stated, the aim of fitting a function is to find a parameter vector $\beta$ that minimizes the following equation:
     
     \begin{equation}
         \left \| y- X\beta \right \| ^2
     \end{equation}
     
-     The penalty term $\lambda$ weights the second derivation of the estimated function $f()$. $\lambda$ penalizes a hectic function by giving less or more weight to the second derivative. As mentioned, the second derivative of a function represents the acceleration or the mentioned 'wiggliness' of a function. With the penalty term the new subject of estimation becomes:
+     The penalty term $\lambda$ weights the second derivation of the estimated function $f()$. $\lambda$ penalizes a hectic function by giving less or more weight to the second derivative. As mentioned, the second derivative of a function represents the acceleration or the mentioned 'wiggliness'. With the penalty term the new subject of estimation becomes:
     
     \begin{equation}
         \left \| y- X\beta \right \| ^2 + \lambda\int_{0}^{1} (f^{''}(x))^2) dx
     \end{equation}
     
-    The trade-off between fitting all x-values and a smooth function is controlled by the penalty term $\lambda$. Since the penalty term weights the smoothness criteria, it is also called smoothing parameter. The choice of $\lambda$ is crucial to the resulting function. While a $\lambda$ of 0 creates a function that will directly pass each x-data point, a high lambda value will over-penalize each acceleration of the function $f$ and generate a straight line. The choice of pen . Since the estimated function $f$ is linear in $\beta$, the subject of estimation can be rewritten as:
+    The trade-off between fitting all x-values and a smooth function is controlled by the penalty term $\lambda$. Since the penalty term weights the smoothness criteria, it is also called smoothing parameter. The choice of $\lambda$ is crucial to the resulting function. While a $\lambda$ of 0 creates a function that will directly pass each x-data point, a high lambda value will over-penalize each acceleration of the function $f$ and generate a straight line. Since the estimated function $f$ is linear in $\beta$, the subject of estimation can be rewritten as:
     
     \begin{equation}
         \left \| y- X\beta \right \| ^2 + \lambda \beta^T S \beta
     \end{equation}
     
-    The matrix $S$ is a penalty matrix that is specific to the chosen basis. The penalty matrix is a diagonal matrix with the penalty values adjacent to the to be penalized term. The problem of estimating the penalized regression spline is to minimize the just stated equation with respect to $\beta$ and to estimate $\lambda$. Estimating $\lambda$ will be discussed in the next section. For a computationally stable fitting of regression splines the above formula can be rewritten as the following:
+    The matrix $S$ is a penalty matrix that is specific to the chosen basis. The penalty matrix is a diagonal matrix that contains the differences of adjacent values. For even spaced knots the penalty can be written as
+    
+    \begin{equation}
+            P = \sum_{i=1}^{k-1} (\beta_{i+1} -  \beta_{i} )^2 = \beta_{1}^2 - 2 \beta_{1} \beta_{2} + 2 \beta_{2}^2 - 2 \beta_{2} \beta_{3} + ... + \beta^2_k
+    \end{equation}
+    
+    And the resulting penalty matrix can be expressed as the multiplication of estimated coefficients and a difference matrix. The diagonal matrix has the difference between adjacent coefficients and its derivatives near the diagonal.
+    
+    \begin{equation}
+        P = \beta^T \begin{bmatrix}
+1 & -1 & 0  & .  & .\\ 
+-1 & 2  & -1  & . & . \\ 
+0 & -1  & 2 & 0 & . \\ 
+.  & .  & .  & . & . \\
+.  & .  & .  & . & . 
+\end{bmatrix} \beta
+    \end{equation}
+    
+    Uneven spaced knots require a more sophisticated penalty term but this penalty matrix has a more illustrative form. The problem of estimating the penalized regression spline is to minimize the just stated equation with respect to $\beta$ and to estimate $\lambda$. It is important to state that this fitting a penalized regression spline requires estimation of $\beta$ and $\lambda$. Estimating $\lambda$ will be discussed in the next section. For a computationally stable fitting of regression splines the above formula can be rewritten as the following:
     
     \begin{equation}
         \label{penalty}
@@ -634,14 +659,14 @@
     }
     @
     
-    With a function for the model matrix X, the penalty matrix S and the ability to take a square root of a matrix, a penalized cubic spline can be found by constructing the full matrix according to \ref{penalty}. 
+    With a function to generate the model matrix X and the penalty matrix S a penalized cubic spline can be approximated by constructing the full matrix according to \ref{penalty}. 
     <<>>=
     prs.fit<-function(y,x,x_knots,lambda)
     # function to fit penalized regression spline to x,y data, 
     # with knots x_knots, given smoothing parameter, lambda.
     {   q<-length(x_knots)+2                # dimension of basis 
         n<-length(x)                        # number of data
-        # create augmented model matrix
+        # create augmented model matrix 
         Xa <- rbind(spl.X(x,x_knots),mat.sqrt(spl.S(x_knots))*sqrt(lambda)) 
         y[(n+1):(n+q)]<-0               # augment the data vector
         lm(y ~ Xa-1)                    # fit penalized regression spline with a linear model
@@ -661,14 +686,14 @@
     From the function prs.fit and \ref{penalty} it should be be evident that the choice of $\lambda$ has a significant influence on the shape of $f$. The figure below illustrates the influence of $\lambda$ on the shape of $f$
     
     
-    \begin{figure}["h"]
+    \begin{figure}[h]
             \centering
             \includegraphics[width=\textwidth]{lambda}
             \caption{\cite{gamBook} states the influence of $\lambda$ on the resulting function $f$.}
             \label{fig:lambda}
         \end{figure}
     
-    \cite{gamBook} states that the influence of $\lambda$ is significant enough so that it should be estimated individually. How to estimate $\lambda$ is discussed in the next section.
+    \cite{gamBook} states that the influence of $\lambda$ is significant enough so that it should be estimated individually. This section shows how to estimate the coefficient vector for penalized the regression splines, the estimation of $\lambda$ is discussed in the next section.
     
     \subsubsection{Smoothing Parameter Estimation}
     The previous section and figure \ref{fig:lambda} in particular illustrated the importance of the smoothing parameter $\lambda$. A high value for $\lambda$ will cause an over-smoothing while a low value will under-smooth the data. Too high or too low, a bad choice for $\lambda$ will result in a spline $\widehat{f}$ that is far from the original unknown function $f$. An ideal $\lambda$ would have a small distance between $f$ and $\widehat{f}$. A measure $M$ is defined to capture this notion.
@@ -677,13 +702,13 @@
         M = \frac{1}{n} \sum_{i=1}^{n} (\widehat{f}_i - f_i)^2
     \end{equation}
     
-    \cite{gamBook} uses the following notation for the following equations: $\widehat{f}_i \equiv \widehat{f}(x_i)$ and  $f_i \equiv f(x_i)$. A suitable criterion to estimate $\lambda$ is thus to minimize $M$. However, since the true function $f$ is known, $M$ cannot be estimated but it is possible to estimate the squared error $E(M)+\sigma^2$. \cite{gamBook} proposes to find $\lambda$ through cross validation. Given $\widehat{f}^{-i}$ is the estimated function on all data except $y_i$, a ordinary cross validation can be given:
+    \cite{gamBook} uses the following notation for the following equations: $\widehat{f}_i \equiv \widehat{f}(x_i)$ and  $f_i \equiv f(x_i)$. A suitable criterion to estimate $\lambda$ is thus to minimize $M$. However, since the true function $f$ is known, $M$ cannot be estimated but it is possible to estimate the squared error $E(M)+\sigma^2$. \cite{gamBook} proposes to find $\lambda$ through cross validation. Cross validation is widely used in statistics. Broadly speaking cross validation validates a model on data outside the training set. Given $\widehat{f}^{-i}$ is the estimated function on all data except $y_i$, an ordinary cross validation can be given:
     
     \begin{equation}
         V_o = \frac{1}{n} \sum_{i=1}^{n} (\widehat{f}^{-i} - y_i)^2
     \end{equation}
     
-    This score results from leaving out each data point in turn, fitting the model to the remaining data and calculating the squared difference between the missing data point and its predicted value. These squared differences are then averaged over all the data. It should be obvious that the process of refitting the function for each $y$ value is $O(n^2)$. \cite{gamBook} states that the ordinary cross validation score can be defined in terms of the influence matrix.
+    This score results from leaving out each data point in turn, fitting the model to the remaining data and calculating the squared difference between the missing data point and its predicted value. These squared differences are then averaged over all the data. It should be obvious that the process of refitting the function for each $y$ value is $O(n^2)$. A computationally superior cross validation score can be given in terms of the influence matrix \cite{gamBook}.
     
     \begin{equation}
         V_o = \frac{1}{n} \sum_{i=1}^{n} (y_i -\widehat{f}_i)^2 /(1-A_{ii})^2
@@ -695,7 +720,7 @@
         V_g = \frac{n \sum_{i=1}^{n} (y_i - \widehat{f}_i )^2}{tr(I-A)^2} 
     \end{equation}
     
-    This section will use this definition to compute the gcv score for a given function and the given hat matrix. Thereby the definition a simple loop can be established in order to find the best possible $\lambda$. The model producing the smallest gcv score generates the smoothest possible cubic spline for the given data set.
+    This section will use this definition to compute the gcv score for a given function and the given hat matrix. Thereby the definition a simple loop can be established in order to find the best possible $\lambda$. This a very simple approach to find the smoothing parameter that minimizes the gcv score. The model producing the smallest gcv score generates the smoothest possible cubic spline for the given data set.
     <<>>=
     lambda<-1e-8
     n<-length(wear)
@@ -716,7 +741,7 @@
     lines(xp,Xp%*%coef(mod.3))
     @
     
-    This section introduced the gcv score as a measure to evaluate the fit of a penalized regression spline. The gcv score is the central metric in evaluating choices for $\lambda$ and will be used the the following sections to evaluate generalized additive models.
+    This section introduced the gcv score as a measure to evaluate the fit of a penalized regression spline. The gcv score is the central metric in evaluating choices for $\lambda$ and will be used the the following sections to search for the ideal generalized additive models.
     
     \subsection{Additive Model}
     The discussed methods allow to fit a regression spline to a single variable. Almost all relevant models have more than one variable. The additive model allows to model the response as the sum of several predictors. \cite{gamBook} formally describes the additive model as:
@@ -744,7 +769,7 @@
     am.setup<-function(x,z,q=10)
         # Get X, S_1 and S_2 for a simple 2 term AM 
         { 
-        # generate equidistant knots
+        # generate equidistant knots for simplicity
         xk <- quantile(unique(x),1:(q-2)/(q-1))
         zk <- quantile(unique(z),1:(q-2)/(q-1))
         # Generate two individual, non-overlaping penalty matricies
@@ -762,7 +787,7 @@
 
     @ 
    
-    The function am.setup generates the model matrix and the penalty matrices for two predictor variables and a fixed set of equidistant knots \cite{gamBook}. The knots are an arbitrary choice and only for illustrative purposes. A key aspect is that the function sets up two penalty matrices. To maintain the additive property each penalty matrix gets placed in full penalty matrix that is zeroes outside of the individual penalty matrix. The full penalty matrix has the size of n rows and the number of parameters multiplied by the penalty matrices. For example, the first penalty matrix covers all rows of for the first number of parameter columns and is zero otherwise. The second penalty matrix is 0 where the previous matrix was defined. Setting the penalty matrix up this way allows to estimate the smoothing parameter individually in the next function. The constructed model matrix $X$ and the list of penalty matrices are now sufficient to estimate an additive model.
+    The function am.setup generates the model matrix and the penalty matrices for two predictor variables and a fixed set of equidistant knots \cite{gamBook}. The knots are an arbitrary choice and only for illustrative purposes. A key aspect is that the function sets up two penalty matrices. To maintain the additive property each penalty matrix gets placed in a scaled penalty matrix that is zeroes outside of the individual penalty matrix. The scaled penalty matrix has the size of n rows and the number of parameters multiplied by the penalty matrices. For example, the first penalty matrix covers all rows of for the first number of parameter columns and is zero otherwise. The second penalty matrix is 0 where the previous matrix was defined. Setting the penalty matrix up this way allows to multiply the smoothing parameter individually to each matrix and maintains the additive property. The constructed model matrix $X$ and the list of individual penalty matrices are now sufficient to estimate an additive model.
    
     <<>>=
     fit.am<-function(y,X,S,sp)
@@ -781,23 +806,27 @@
     @
    
     
-    The function fit.am takes the previously generated model and penalty matrix, a vector of $y$ values and a vector of smoothing parameter values and produces a list of the model and the gcv score \cite{gamBook}. Each penalty matrix receives an individual smoothing parameter. Defining the full penalty matrix as zero outside of the individual penalty matrix allows to multiply the smoothing parameter and then add the individual matrices to form the full penalty matrix $rS$. The model matrix on top of the penalty matrix form the complete model matrix $X$. Since the model matrix has more rows that the data  vector $y$, the data vectors receives zeroes to match the augmented matrix' number of rows. The resulting model is then fit via the linear model from section two. After the model is fit, the gcv score gets computed and gets stored.
+    The function fit.am takes the previously generated model and penalty matrix, a vector of $y$ values and a vector of smoothing parameter values and produces a list of the model and the gcv score \cite{gamBook}. Each penalty matrix receives an individual smoothing parameter. Defining the full penalty matrix as zero outside of the individual penalty matrix allows to multiply the smoothing parameter and then add the individual matrices to form the full penalty matrix $rS$. The model matrix on top of the penalty matrix form the complete model matrix $X$. Since the model matrix has more rows that the data  vector $y$, the data vectors receives zeroes to match the augmented matrix' number of rows. The resulting model is then fit via the linear model from section two. After the model is fit, the gcv score gets computed and stored.
     
     \subsection{Additive Model Example}
-    The process of fitting a two term additive model can be best understood by using the setup.am and fit.am functions on a data set. \cite{gamBook} uses the default R data set $trees$. This data set contains three variables: Volume, Girth and Height for 31 felled cherry trees. The author suggests the following model to illustrate an additive model:
+    The process of fitting a two term additive model can be best understood by using the setup.am and fit.am functions on a data set. \cite{gamBook} uses a default R data set called $trees$. This data set contains three variables: Volume, Girth and Height for 31 felled cherry trees. The process of fitting an additive model via cubic splines can by illustrated by explaining the volume of a cherry as the functon of girth and height. The author suggests the following model:
+    
     \begin{equation}
         Volumne = f_1(Girth) + f_2(Height) + \epsilon_i
     \end{equation}
     
     This model can be estimated with the functions defined in the previous section. 
     
-     <<>>=
+     <<echo=FALSE>>=
     data(trees)
     rg <- range(trees$Girth)
     rh <- range(trees$Height)
     ## rescaling of parameter to onto [0,1]
     trees$Girth <- (trees$Girth - rg[1])/(rg[2]-rg[1]) 
     trees$Height <- (trees$Height - rh[1])/(rh[2]-rh[1])
+    @
+    
+    <<>>==
     am0 <- am.setup(trees$Girth,trees$Height)
     @
     The model matrix and the penalty matrices are setup with the rescaled parameters of Girth and Height. The resulting list can then be used to estimate the full model but not the smoothing parameter. To estimate the smoothing parameter, the fit.am functions is called with several choices of $\lambda$. The $\lambda$ that generates the lowest gcv score is estimated by iteratively trying different $\lambda$ values.  
@@ -814,11 +843,9 @@
     best$sp # GCV best smoothing parameter 
     @
     
-    The resulting smoothing parameter for Girth is fairly presumably allowing $f_1$ some curvature. Height has a very high smoothing parameter, this most likely results in a rather straight line. The values of the smooths at the predictor variable values can be obtained quite easily by zeroing all model coefficients, except those corresponding to the term of interest and using predict as the following code shows.
+    The resulting smoothing parameter for Girth is fairly low,  presumably allowing $f_1$ some curvature. Height has a very high smoothing parameter, this most likely results in a rather straight line. The values of the smooths at the predictor variable values can be obtained quite easily by zeroing all model coefficients, except those corresponding to the term of interest and using predict as the following code shows.
 
-    
     <<echo=FALSE, cache=TRUE, fig.height=4, fig.width=4, fig.pos="t">>=
-    
     # plot 
     plot(trees$Volume,fitted(best$model)[1:31],
         xlab="Fitted Volume",ylab="Actual Volume") 
@@ -834,7 +861,7 @@
     The resulting plot confirms the observation that the Girth smooth has more curvature than the Height smooth. The middle figure is the estimate of the smooth function of Girth at the given Girth data. The right figure is the estimate of the smooth function of Height at the given Height data. 
    
     \subsection{Generalized Additive Model}
-    Generalized additive models (GAMs) follow from additive models, as generalized linear models follow from linear models. Like the GLM, the GAM predicts some known smooth monotonic function of the expected value of the response. The response follows any exponential family distribution. For the sake of illustrating the similarities to a GLM the function fit.am can extended to account for a gamma error and log link function.  
+    Generalized additive models (GAMs) follow from additive models, as generalized linear models follow from linear models \cite{gamBook}. Like the GLM, the GAM predicts some known smooth monotonic function of the expected value of the response. The response can follow any exponential family distribution. For the sake of illustrating the similarities to a GLM the function fit.am can extended to account for a gamma error and log link function.  
     
     <<>>==
     fit.gamG<-function(y,X,S,sp)
@@ -858,8 +885,7 @@
         }
     @
     
-    The function fit.gamG takes a model matrix X and a list of penalty matrices S. Both can be generated by the am.setup function. The generalized additive model seeks the best smoothing parameter by iteratively searching for a value until convergence. Each iteration step forms a vector of pseudo data. Pseudo data is the estimated values of the current parameter estimation. If the resulting gcv score of the current pseudo data does not change, the model is converged. The fitting process is called penalized iterative re-weighted least squares and formally described in the next section.
-    
+    The function fit.gamG takes a model matrix X and a list of penalty matrices S. Both can be generated by the am.setup function. The generalized additive model seeks the best smoothing parameter by iteratively searching for a value until convergence. Each iteration step forms a vector of pseudo data. Pseudo data is the estimated values of the current parameter estimation after transformation by the canonical link function. If the resulting gcv score of the current pseudo data does not change, the model is converged. This function highlights the two step approach to fitting GAMs. Use a given choice of lambda parameters to generate the penalty matrix. Merge the model and penalty matrix and estimate the coefficients.The fitting process of finding $\beta$ given a choice of $\lambda$ is called penalized iterative re-weighted least squares and formally described in the next section.
     
     
     
@@ -886,17 +912,22 @@
     The P-IRLS accounts for the penalty matrix required to fit additive models with smoothing functions.
     
     \subsubsection{Generalized Additive Model Example}
-    Fitting a GAM with the fit.gamG function we can see a slightly better fit than th
+    
     
     
     
     \section{Apache Spark}
+    Apache Spark is general purpose cluster computing framework introduced by \cite{SparkIntro}. The decreasing cost of computing hardware has . Map-Reduce was the first main stream
         \subsection{General In Memory Cluster Computing Framework}
+        \subsection{Resilient Distributed Datasets}
         \subsection{The Language Scala and Breeze}
         \subsection{Machine Learning Pipeline}
         \subsubsection{Transformer}
         \subsubsection{Estimator}
         \subsection{Implementing GAM in Apache Spark}
+        \subsection{Optimized GAMs for large data sets}
+        \subsubsection{Cross Validation}
+        \subsubsection{Parallel Estimation}
         \subsection{R vs Spark vs SparkR}
         \subsubsection{Architecture}
         
