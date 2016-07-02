@@ -34,13 +34,10 @@
 
 
 \title{
-    Generalized Additive Models for\\ very large data sets with Apache Spark \\ or \\ 
-    Generalized Additive Models with Apache Spark\\ or \\
-    Generalized Additive Models for very large data sets
-    \\[7pt]
+    Generalized Additive Models for\\ very large data sets with Apache Spark \\
     \large Chapter Excerpt
 }
-\date{05/06/2016}
+\date{05/16/2016}
 \author{Kai Thomas Brusch}
 
 \begin{document}
@@ -51,7 +48,7 @@
 
     \paragraph{Summary}
 
-    This document contains the first chapters for my bachelor thesis titled "Generalized Additive Models for very large data sets with Apache Spark" and an outlook for the coming chapters.
+    This document contains the first chapters for my bachelor thesis and an outlook for the coming chapters.
 
     \paragraph{Contact} \texttt{kai.brusch@gmail.com}
 
@@ -71,9 +68,9 @@
     
     \epigraph{Statistics is the the grammar of science}{\textit{Karl Pearson}}
 
-    Karl Pearson, the father of applied statistics famously described statistics as the grammar of science. Leveraging data as a method of inquiry has become the maxim of modern scientific thought. Hypothesis testing, statistical modeling and measurement are areas in which statistics are essential to every quantitative science. "The coming century is surely the century of data" David Donoho recognizes the 21th century as the century of data and statistics. The advent of modern, large-scale computing has placed the computer at the heart of modern statistics. The ever growing ability to process and  store data has facilitated a quantum leap in science, technology and business. Consumer electronics and the modern Internet have generated more data in the past two years than in the prior 2000 years. Modern statistics has developed sophisticated models to discover and explain hidden patterns in data. Advances in computing have bridged the gap between large data sets and statistical inquiry. Cluster computing frameworks allow statistical models to process gigabytes of data. This thesis focuses on a statistical model called generalized additive model ("GAM"). \cite{gam} describes the GAM as the compromise of interpretable and flexible models. The GAM provides the interpretability of traditional linear models but allows for flexible estimation of some variables. 
+    Karl Pearson, the father of applied statistics famously described statistics as the grammar of science. Leveraging data as a method of inquiry has become the maxim of modern scientific thought. Hypothesis testing, statistical modeling and measurement are areas in which statistics are essential to every quantitative science. "The coming century is surely the century of data" David Donoho recognizes the 21th century as the century of data and statistics. Consumer electronics and the modern Internet have generated more data in the past two years than in the prior 2000 years. The ever growing ability to process and  store data has facilitated a quantum leap in science and technology. Statistics is also migrating into the commercial space and companies are leveraging statistical models creating the term 'Data Science' and 'Big Data'. The advent of modern, large-scale computing has placed the computer at the heart of modern statistics. Modern statistics has developed sophisticated models to discover and explain hidden patterns in data. Advances in computing have bridged the gap between large data sets and statistical inquiry. Cluster computing frameworks allow statistical models to process gigabytes of data. This thesis focuses on a statistical model called generalized additive model ("GAM"). GAM present an interesting compromise of interpretable and flexible models \cite{gam}. The GAM provides the interpretability of traditional linear models but allows for smooth and flexible estimation of some variables.  
     
-    GAMs and much of modern statistical research is published in the programming language R. \cite{gamBook} implemented an optimized version of the GAM in an R packaged called Mixed GAM computation Vehicle ("mgcv"). R was written by statisticians and has become the lingua fracta for statistical research. R has recently surpassed Stata as the most popular statistical programming language. However, R is not designed for parallelization and cluster computing. Apache Spark ("Spark") has emerged as the most prominent general purpose cluster computing frame work. The ability to perform distributed, in-memory computation while preserving a high level of abstraction makes Spark a popular cluster computing framework. The distributed nature of Spark allows the performance of iterative operations on large data sets while maintaining the data in-memory. Spark appears to be an ideal computation environment for GAMs, because GAMs are estimated by a highly iterative process. Exploring the advantages of using Spark rather than R for GAM estimation is the goal of this thesis. 
+    GAMs and much of modern statistical research is published in the programming language R. \cite{gamBook} implemented an optimized version of the GAM in an R packaged called Mixed GAM computation Vehicle ("mgcv"). R was written by statisticians and has become the lingua fracta for statistical research. R has recently surpassed Stata as the most popular statistical programming language. However, R is not designed for parallelization and cluster computing. Apache Spark ("Spark") has emerged as the most prominent general purpose cluster computing frame work. Spark was designed to perform distributed, in-memory computation while preserving a high level of abstraction \cite{SparkIntro}. Estimating GAMs requires two interlocking estimation processes: (1) Estimate a smoothing parameter $\lambda$ (2) Given a $\lambda$ estimate the coefficients of the penalized generalized linear model. Smoothing parameter estimation can be parallelized by computing the relevant factors of the model matrix while forming only subblocks of the model matrix \cite{bigdataGAM}. The penalized generalized linear model is estimated via an iterative fitting process. Given the parallel nature of smoothing parameter estimation and the iterative nature of penalized generalized linear model estimation Spark appears to be an ideal computation environment for GAMs. Exploring the advantages of using Spark rather than R for GAM estimation is the goal of this thesis. 
     
     This thesis comprises \ref{end} sections. The goal of the first three sections is to introduce the GAM by explaining its components in order of increased complexity. Starting with the framework of statistical learning and the linear model followed by the generalized linear model and finishing with the GAM. Sections 5 details the implementation of GAMs in Spark and includes a language comparison of Spark and R. The final two sections evaluate the implementation by way of comparison and conclude with a discussion on future work.
     
@@ -152,7 +149,7 @@
     
     \subsection{Statistical Computing Environment: R}
         
-    R is a free software environment for statistical computing and graphics. R is designed to express statistical models and comes with an development environment that is built to illustrate and discover data. R is widely recognized as language for statistical research. This thesis uses R to express statistical concepts and examples. This section introduces relevant syntax for matrix manipulation in R:
+    R is a free software environment for statistical computing and graphics. R is designed to express statistical models and comes with an development environment that is built to illustrate and discover data. R is a widely recognized language for statistical research. This thesis uses R to express statistical concepts and examples. This section introduces relevant syntax for matrix manipulation in R:
     
   <<chunk1>>=
     # A vector is the atomic unit in R
@@ -179,52 +176,120 @@
     X%*%coef(mod)[2:4]
     @
         
+    \section{Maximum-Likelihood Estimation}
+        Maximum-likelihood estimation ('MLE') provides a single framework for estimating linear models, generalized linear models and generalized additive models. Unlike probability, likelihood is used after data is available to describe a function of a parameter vector for a given outcome. Likelihood also does not always sum to one and may not even be integrable with respect to beta. \cite{glm} describes the principle of maximum likelihood estimation as searching for probability distribution parameters that makes the observed data most likely. This results in a search for the parameter vector that maximizes the likelihood function $L(\beta|y)$. The parameter vector is found by searching the multi-dimensional parameter space.\cite{MLE} describes MLE as finding the parameters for a distribution that were most likely to produce the given data. Random variables are defined in terms of one or several parameters. Usually the distribution parameters are the observed variance and mean. The Poisson, for example, assumes mean $=$ variance and thus only requires one parameter $P(\lambda)$. The gamma distribution is defined in terms of shape $k$ and scale $\theta$  $G(K,\theta)$ two. Maximum likelihood estimation provides a single framework to allow parameter estimation for any of the exponential family distributions \cite{glm}.  
+
+        From a statistical analysis point of view the vector $y$ of observed data is a random sample from an unknown population. The goal of maximum likelihood estimation is to find the parameters of the given distribution that most likely  produced this sample. This process is described with a probability density function ('PDF') $f()$ of observed data $y$ given a parameter $\beta$: $f(y|\beta)$. If individual observations, $y_i$, are statistically independent of one another, the PDF for the data $y$, given the parameter vector $\beta$, can be expressed as a multiplication of PDFs for individual observations.
     
+        \begin{equation} f(y|\beta) = f((y_1, y_2,...,y_n) | (\beta_1,\beta_2, ... \beta_n )) = \prod_{i=1}^{n} f_i(y_i|\beta_i) ) \label{likelihood} \end{equation}
     
-    \section{Linear Models}  \label{glm}
-        The linear model is the elementary form of statistical models. It enforces a strict parametric form on the estimated function and belongs to the parametric methods. Even though linear models have limited real world applications they introduce many relevant ideas and concepts for the following methods. The generalized linear model is the generalized version of the linear model and eases some restrictions set by the linear model. Both models are essential for understanding the GAM, which is the main subject of this thesis. The GAM is an extension of the generalized linear model. In the following, the theory behind linear and generalized linear models is explained, before these theories are used in the estimation process. Finally, the theories are applied in an exemplary fitting process.  
-        
+        Given a set of parameter values, the corresponding PDF will show that some data are more probable than other data. However, the data is already given and the search is for the parameters of the distribution that most likely produced the data. Thus the conditional probability is reversed. From $f(y|\beta)$ to $L(\beta|y)$ produces the likelihood of $y$ given the parameters $\beta$. For computational convenience, the MLE is obtained by maximizing the log-likelihood function, $ln(L(\beta|y))$. This is because the two functions, $ln(L(\beta|y))$ and $L(w|y)$ are monotonically related to each other. Consequently the same MLE estimate is obtained by maximizing either one. However, the log-likelihood is preferred because it transforms the product in \ref{likelihood} to a sum. Assuming that the log-likelihood function $ln(L(\beta|y))$ is differentiable, if $\beta$ exists, it must satisfy the following partial differential equation known as the likelihood equation:
+    
+        \begin{equation} \frac{\partial ln L(\beta|y)}{\partial \beta_i} = 0 \end{equation}
+    
+        These properties are given because the definition of the maximum or minimum of a continuous differentiable function implies that its first derivatives vanish at such points. The likelihood equation represents a necessary condition for the existence of an MLE estimate. An additional condition must also be satisfied to ensure that $ln(L(\beta|y))$ is a maximum and not a minimum, since the first derivative cannot reveal this. The log-likelihood must be convex near w. This is verified by calculating the second derivatives of the log-likelihoods and checking if they are negative.
+    
+        \begin{equation} \frac{\partial^2 ln L(\beta|y)}{\partial \beta^2_i} < 0 \end{equation}
+    
+        This form is only of theoretical value as practical models often involve many parameters and have highly non-linear PDFs. Thus the estimate must be sought numerically using non-linear optimization methods. The basic idea for these methods is to find optimal parameters that maximize the log-likelihood focusing on smaller sub-sets of the multi-dimensional parameter space. This is the preferred approach because exhaustively searching the whole parameter space becomes intractable with an increasing amount of parameters. The practical method for MLE searches by trial and error over the course of a series of iterative steps.  Each iteration changes the parameters vector from the previous iteration by a small value. The choice of the value is tailored to improve the log-likelihood. Though the choice of parameters can be challenged by other means of estimation it be can shown that distribution parameter estimation via MLE will result in the best unbiased estimator \cite{Nelder}. This thesis focuses on estimation of linear, generalized linear and generalized additive model via likelihood estimation. 
+    
+        \section{Linear Models}  \label{glm}
+        The linear model is the elementary form of statistical models. It enforces a strict parametric form on the estimated function and belongs to the parametric methods. Even though linear models have limited real world applications they introduce many relevant ideas and concepts for the following methods. The generalized linear model is the generalized version of the linear model and eases some restrictions set by the linear model. Both models are essential for understanding the GAM, which is the main subject of this thesis. The GAM is an extension of the generalized linear model. In the following, the theory behind linear and generalized linear models is explained, before these theories are used in the estimation process.   
         
         \subsection{Simple Linear Model}
-        
         The simple linear model (or linear regression), explains the response variable as the linear combination of a predictor variable and the estimated coefficients. It is the simplest linear model and explains a normal distributed response variable in terms of one explanatory variable. \cite{gamBook} describes the theory for a linear model with one explanatory variable as follows: Given $n$ observations of $x_i$ and $y_i$ where $y_i$ is the observations of a random variable $Y_i$ with expectation $\mu_i \equiv E(Y_i)$, a linear model has the following parametric form:
         
         \begin{equation}
-            Y_i = x_i \beta + \epsilon_i \ where \ \mu_i = x_i \beta
+            Y_i = x_i \beta + \epsilon_i \ where \ \mu_i = x_i \beta \label{simple_linear}
         \end{equation}
       
-        The key assumption for the linear model is that $\epsilon_i$ is a Gaussian distributed error term and independent variance of x and y. A linear model assumes that $\epsilon_i$ are mutually independent zero mean random variables with variance $\sigma^2$. The linear model explains the response variable $Y$ in terms of a predictor variable $x$  multiplied by an estimated coefficient $\beta$ plus a random error term $\epsilon$. 
+        The key assumption for the linear model is that $\epsilon_i$ is a Gaussian distributed error term and independent variance of x and y. A linear model assumes that $\epsilon_i$ are mutually independent zero mean random variables with a constant variance $\sigma^2$. The assumption of constant variance for all $x_i$ is also called homoscedasticity. The linear model explains the response variable $Y$ in terms of a predictor variable $x$  multiplied by an estimated coefficient $\beta$ plus a normal distributed random error term $\epsilon$. $y_i$ and $x_i$ are known but $\beta$ is unknown and thus needs to be estimated. 
         
-        \begin{figure}[h]
-            \centering
-            \includegraphics[width=\textwidth]{simple_linear_model}
-            \caption{\cite{gamBook} visually states the relationship between $\beta$ $\epsilon$ and $x_i$ and $Y_i$}
-            \label{fig:simple_linear_model}
-        \end{figure}
+        \subsection{Maximum-likelihood and least-squares}
+         The simple linear model described in \ref{simple_linear} can be estimated with several similar techniques. This section describes the estimation process via maximum-likelihood.  MLE for simple linear models assumes five conditions. (1) The $x$ values can be described in terms of an arbitrary random variable $X$. (2) If $X = x$, then $Y=\beta_0 + \beta_1x + \epsilon$ for some coefficients $\beta_0$ and $\beta_1$ and some random noise variable $\epsilon$ (3) The error term $\epsilon$ is approximately $N(0,\sigma^2)$ and independent of $X$ with a constant variance (4) $\epsilon$ is independent across observations. (5) The response variable $Y$ is independent across observations and conditional on $X$. The simple linear model can be estimated without the third and fourth assumption but they are required for MLE. Because of the Gaussian error term this approach is also called the Gaussian-noise simple linear regression model. The Gaussian-noise simple linear regression model allows to state the conditional PDF of $Y$ for each $x$ as:
+         
+         \begin{equation}
+             p(y | X = x ; \beta_0 ,\beta_1,  \sigma^2 )
+         \end{equation}
+        
+        This notation explicitly removes the parameters from the random variables. Treating the random variable parameters individually highlights the estimation through distribution parameter estimation. Given the Normal distribution PDF and data-set of observations in tuple form $(x_n, y_n)$ a general form of the MLE PDF can expressed.
+        
+         \begin{equation}
+             \prod_{i=1}^{n} p(y | X = x_i ; \beta_0 ,\beta_1,  \sigma^2 ) = \prod_{i=1}^{n} \frac{1}{\sqrt{2 \pi \sigma^2}}e^{\frac{(y_i-(\beta_0+ \beta_1 x_1))^2}{2 \sigma^2}}
+         \end{equation}
+        
+        The independence assumption of $Y_i$ allows to write the PDF as a product of conditional probabilities. However, the relevant question goes in the opposite direction: What are the parameters $\beta_0,\beta_1$ and $\sigma^2$ that likeliest produced the probability density function that generated the observed data? Thus the PDF has be to rearranged to express the desired parameters. Given a choice of a parameter vector $(b_0, b_1, s^2)$ the likelihood as a function of the those parameters can be given as:
+        
+         \begin{equation}
+             \prod_{i=1}^{n} p(y | X = x_i ; b_0 , b_1,  s^2 ) = \prod_{i=1}^{n} \frac{1}{\sqrt{2 \pi \sigma^2}}e^{\frac{(y_i-(b_0+ b_1 x_1))^2}{2 s^2}}
+         \end{equation}
+        
+        As described in the MLE section the likelihood $l$ is best examined in terms of the log-likelihood $L$. Leveraging the log-likelihood the likelihood can be expressed in terms of a sum:
+        
+        \begin{equation}
+            L(b_0, b_1, s^2) = log \prod_{i=1}^{n} p(y_i | X = x_i ; b_0 , b_1,  s^2 ) 
+        \end{equation}
+        
+        \begin{equation}
+            = \sum_{i=1}^{n} log \ p(y_i | X = x_i ; b_0 , b_1,  s^2 )
+        \end{equation}
+        
+        \begin{equation}
+            - \frac{n}{2} \ log \ 2 \pi - n \ log \ s - \frac{1}{2s^2} \sum_{i=1}^{n} (y_i - (b_0 +b_1 x_i)))
+        \end{equation}
         
         
-        $y_i$ and $x_i$ are known but $\beta$ is unknown and thus needs to be estimated. The simple linear model gives one approach to estimate $\beta$ from the given data $x_i$,$y_i$. The simple linear model seeks to find the $\beta$ that minimizes the squared difference between $y_i$ and $x_i$. Formalizing this notion leads to the definition of the least squares measure $S$:
+        With this formulation the log-likelihood for a given data set and a choice of distribution parameters can be computed. A key feature of the log-likelihood is that the distribution parameters can be approximated in the following form \cite{mathstat}.
+        
+        \begin{equation}
+            \beta_1 = \frac{\sum_{i=1}^{n} (x_i - \bar{x}) (y_i - \bar{y})} {\sum_{i=1}^{n} (x_i -\bar{x})^2 } = \frac{c_{XY}}{s^2_X}
+        \end{equation}
+        
+        \begin{equation}
+            \beta_0 = \bar{y}-\beta_1\bar{x}
+        \end{equation}
+        
+        \begin{equation} \label{sigma}
+            \sigma^2 = \frac{1}{n} \sum_{n}^{1} (y_i - (\widehat{\beta_0} + \widehat{\beta_1}x_i ))^2
+        \end{equation}
+        
+        A special property of the Gaussian-noise model is that the MLE coefficients in log-space are equal to the least squares solution. The estimated coefficients $\beta_1$ and $\beta_2$ are also the slope and intercept of a linear function that passes through the data tuples $(x_i,y_i)$. The variance $\sigma^2$ is also the average error of the linear function that passes through the data. This connection only works under the assumption of a Gaussian error term and  a constant variance. The constant variance has been reflected in \ref{simga} by giving equal weight for each data point. The least squares approach gives an alternative approach to estimate $\beta$ from the given data $x_i$,$y_i$. In this approach the model seeks to find the $\beta$ that minimizes the squared difference between $y_i$ and $x_i$. Formalizing this notion leads to the definition of the least-squares measure $S$:
         
         \begin{equation} 
-        \mathbf{S} =  \sum_{i=1}^{n}(y\textsubscript{i} - x\textsubscript{i}\beta)^{2} = \sum_{i=1}^{n}(y\textsubscript{i} - \mu\textsubscript{i})^{2} 
+        \mathbf{S} =  \sum_{i=1}^{n}(y\textsubscript{i} - (\beta_1 + x\textsubscript{i}\beta_1))^{2} = \sum_{i=1}^{n}(y\textsubscript{i} - \mu_i)^{2}
         \end{equation}
-        Per this definition a good choice of $\beta$ minimizes the difference between $y_i$ and $\mu_i$. As $S$ converges $0$ the better of an estimated $\beta$  becomes . The problem of least square estimation becomes minimizing $S$ with respect to $\beta$. To minimize S, differentiate with respect to (w.r.t.) $\beta$.
         
-        \begin{equation} \label{partialDer} \frac{\partial S}{\partial \beta} = - \sum_{i=1}^{n} 2x_i(y_i-x_i\beta) \end{equation}
-
-       By setting the result to $0$ the best estimate for $\beta$ can be found. The best estimate for $\beta$ is called $\widehat{\beta}$.  After setting the equation to zero and rearranging term to express $\widehat{\beta}$ in terms of $x_i$ and $y_i$ the full problem of estimating $beta$ can be stated as:
-
-        \begin{equation}  - \sum_{i=1}^{n} 2x_i(y_i-x_i\widehat{\beta}) = 0  \end{equation}
-
-        \begin{equation} - \sum_{i=1}^{n} x_i y_i-\widehat{\beta} \sum_{i=1}^{n} x_i^2 = 0  \end{equation}
-
-        \begin{equation} \widehat{\beta} = \sum_{i=1}^{n} x_i y_i /\sum_{i=1}^{n} x_i^2 \end{equation}
-
-
-        Minimizing $S$ w.r.t. $\beta$ to compute $\widehat{\beta}$ is a reasonable approach when dealing with one explanatory variable. The Gauss-Markov theorem shows that estimating $\beta$ with $\widehat{\beta}$ is best linear unbiased estimator. However, most relevant linear models involve more explanatory variables than one. The question for finding must be account for multiple explanatory variables but the measure of fit $S$ remains.
+        Per this definition a good choice of $\beta$ minimizes the difference between $y_i$ and $\mu_i$. As $S$ converges $0$ the better of an estimate $\beta$ becomes. The problem of least square estimation becomes minimizing $S$ with respect to $\beta_0$ and $\beta_1$. To minimize S the, differentiate with respect to (w.r.t.) $\beta_0$ and $\beta_1$. For algebraical reasons $-S$ is maximized.
+        
+        \begin{equation} \label{partialDer} \frac{\partial S}{\partial \beta_0} = 0 \end{equation} 
+        
+        \begin{equation} \frac{\partial S}{\partial \beta_1} = 0 \end{equation} 
+        
+        These two equations are called the normal equations. To find the parameters both have to be maximized. In the normal equations two point estimators $b_0$ and $b_1$ estimate $\beta_0$ and $\beta_1$ respectively.
+        
+        \begin{equation}
+         \sum_{n}^{1} y_i = n b_0 + b_1  \sum_{n}^{1}x_i
+        \end{equation}
+        
+        \begin{equation}
+            \sum_{n}^{1} x_i y_i = b_0  \sum_{n}^{1}x_i + b_i \sum_{n}^{1} x^2_i
+        \end{equation}
+         
+        The normal equations in this case are two equation with two unknowns. This system of equations can be solved \cite{mathstat}.
+        
+        \begin{equation}
+            \beta_1 = \frac{\sum_{i=1}^{n} (x_i - \bar{x}) (y_i - \bar{y})} {\sum_{i=1}^{n} (x_i -\bar{x})^2 } = \frac{c_{XY}}{s^2_X}
+        \end{equation}
+        
+        \begin{equation}
+            \beta_0 = \bar{y}-\beta_1\bar{x}
+        \end{equation}
+        
+        
+        This shows that under the given conditions the point estimators $b_0$ and $b_1$ are equivalent to the MLE estimates $b_0$ and $b_1$. Thus the estimation under Gaussian-noise with MLE is the same as estimating the linear model with least squares. This link provides a strong framework for numerically stable and efficient fitting of the general linear model in terms of matrices and vectors.
       
         \subsection{Linear Model}
-         \cite{gamBook} introduces the linear model as the generalization of the simple linear model, allowing for the response variable to be explained with multiple predictor variables. Though the linear model generalizes the simple linear model it still assumes a normal distributed $Y$.
+         \cite{gamBook} introduces the linear model as the generalization of the simple linear model, allowing for the response variable to be explained with multiple predictor variables. Though the linear model generalizes the simple linear model it still assumes a normal distributed $Y$ and equal variance.
         \subsubsection{Linear Model in the vector-matrix form}
         Several predictor variables require rewriting the simple linear model in terms of vectors and matrices. A major benefit of using the matrix-vector forms is that the problem of finding $\beta$ becomes the problem of solving an overdetermined system of equations. Again, given n observations of $y_i$ and $x_i$ plus some additive constant. Explicitly writing each $\mu_i = x_i \beta_i$ illustrates the shape of the system of equations.
         \begin{equation}
@@ -249,28 +314,11 @@
            \left[ \begin{array}{c} \mu_1 \\ \mu_2 \\ \mu_3 \\ ... \\  \mu_n\end{array} \right] = \begin{bmatrix} 1 & x_1 & x_2\\ 1 & x_2 & x_2 \\ 1 & x_3 & x_3 \\ ... \\1 & x_n & x_n   \end{bmatrix}  \left[ \begin{array}{c} \beta_0 \\ \beta_1 \\ \beta_2 \end{array} \right]   
         \end{equation}
     
-        The matrix-vector form yields the general form of the linear model $\mu = X\beta$. This means that the value vector $\mu$ is given by the model matrix $X$ multiplied by the unknown parameter vector $\beta$. The model matrix can account for an arbitrary amount of predictor variables by adding a column for each predictor. This formulation assumes numerical predictor variables. Numerical predictor variables can be either continuous or discrete. Continuous predictor variables are usually measurement without a clear boundaries between values, a classic example is measurement of length. Since there are arbitrary many values between 1 meter and 2 meters, i.e. 1.1, 1.01, 1.001 they are called continuous. Discrete values have a clean border between two values. The count of occurrences is an example of a discrete variable.  Categorical var  variables require special encoding in the model matrix. Dummy and factor encoding are the two approaches for factor variables. For a detailed explanation on factor encoding in linear models see \cite{regression}. The model matrix is also known as a design matrix and the terms are used interchangeably. $\mu = X\beta$ is the canonical form of a linear model. Algebraically the method for estimating $\beta$ for one predictor and estimating the unknown vector $\beta$ are very similar. However, stable and efficient numerical solution for the matrix-vector form require adjustments. The modern approach to estimation is maximum-likelihood estimation. 
+        The matrix-vector form yields the general form of the linear model $\mu = X\beta$. This means that the value vector $\mu$ is given by the model matrix $X$ multiplied by the unknown parameter vector $\beta$. The model matrix can account for an arbitrary amount of predictor variables by adding a column for each predictor. This formulation assumes numerical predictor variables. Numerical predictor variables can be either continuous or discrete. Continuous predictor variables are usually measurement without a clear boundaries between values, a classic example is measurement of length. Since there are arbitrary many values between 1 meter and 2 meters, i.e. 1.1, 1.01, 1.001 they are called continuous. Discrete values have a clean border between two values. The count of occurrences is an example of a discrete variable.  Categorical var  variables require special encoding in the model matrix. Dummy and factor encoding are the two approaches for factor variables. For a detailed explanation on factor encoding in linear models see \cite{regression}. The model matrix is also known as a design matrix and the terms are used interchangeably. $\mu = X\beta$ is the canonical form of a linear model. Algebraically the method for estimating $\beta$ for one predictor and estimating the unknown vector $\beta$ are very similar. However, stable and efficient numerical solution for the matrix-vector form require adjustments. 
         
-        \subsubsection{Maximum-Likelihood Estimation}
-        Maximum-likelihood estimation ('MLE') provides a single framework for estimating linear models, generalized linear models and generalized additive models. Unlike probability, likelihood is used after data is available to describe a function of a parameter vector for a given outcome. \cite{glm} describes the principle of maximum likelihood estimation as searching for probability distribution parameters that makes the observed data most likely. This results in a search for the parameter vector that maximizes the likelihood function $L(\beta|y)$. The parameter vector is found by searching the multi-dimensional parameter space.
-
-        \cite{MLE} describes MLE as finding the parameters for a distribution that were most likely to produce the given data. Random variables are defined in terms of one or several parameters. Usually the distribution parameters are the observed variance and mean. The Poisson, for example, assumes mean $=$ variance and thus only requires one parameter $P(\lambda)$. The gamma distribution is defined in terms of shape $k$ and scale $\theta$  $G(K,\theta)$ two. Maximum likelihood estimation provides a single framework to allow parameter estimation for any of the exponential family distributions \cite{glm}.  
-
-        From a statistical analysis point of view the vector $y$ of observed data is a random sample from an unknown population. The goal of maximum likelihood estimation is to find the parameters of the given distribution that most likely  produced this sample. This process is described with a probability density function (PDF) $f()$ of observed data $y$ given a parameter $\beta$: $f(y|\beta)$. If individual observations, $y_i$’s, are statistically independent of one another, the PDF for the data $y$, given the parameter vector $\beta$, can be expressed as a multiplication of PDFs for individual observations.
-    
-        \begin{equation} f(y|\beta) = f((y_1, y_2,...,y_n) | (\beta_1,\beta_2, ... \beta_n )) = \prod_{i=1}^{n} f_i(y_i|\beta_i) ) \label{} \end{equation}
-    
-        Given a set of parameter values, the corresponding PDF will show that some data are more probable than other data. However, the data is already given and the search is for the parameters of the distribution that most likely produced the data. Thus the conditional probability is reversed. From $f(y|\beta)$ to $L(\beta|y)$ produces the likelihood of $y$ given the parameters $\beta$. For computational convenience, the MLE is obtained by maximizing the log-likelihood function, $ln(L(\beta|y))$. This is because the two functions, $ln(L(\beta|y))$ and $L(w|y)$ are monotonically related to each other. Consequently the same MLE estimate is obtained by maximizing either one. However, the log-likelihood is prerred because it transforms the product into a sum. Assuming that the log-likelihood function $ln(L(\beta|y))$ is differentiable, if $\beta$ exists, it must satisfy the following partial differential equation known as the likelihood equation:
-    
-        \begin{equation} \frac{\partial ln L(\beta|y)}{\partial \beta_i} = 0 \end{equation}
-    
-        These properties are given because the definition of the maximum or minimum of a continuous differentiable function implies that its first derivatives vanish at such points. The likelihood equation represents a necessary condition for the existence of an MLE estimate. An additional condition must also be satisfied to ensure that $ln(L(\beta|y))$ is a maximum and not a minimum, since the first derivative cannot reveal this. The log-likelihood must be convex near w. This is verified by calculating the second derivatives of the log-likelihoods and checking if they are negative.
-    
-        \begin{equation} \frac{\partial^2 ln L(\beta|y)}{\partial \beta^2_i} < 0 \end{equation}
-    
-        This form is only of theoretical value as practical models often involve many parameters and have highly non-linear PDFs. Thus the estimate must be sought numerically using non-linear optimization methods. The basic idea for these methods is to find optimal parameters that maximize the log-likelihood focusing on smaller sub-sets of the multi-dimensional parameter space. This is the preferred approach because exhaustively searching the whole parameter space becomes intractable with an increasing amount of parameters. The practical method for MLE searches by trial and error over the course of a series of iterative steps. Each iteration changes the results from the previous iteration by a small value. The choice of the value is tailored to improve the log-likelihood. GLM are fit by a method called iterative re-weighted least squares and is subject of the next section.
         
-        \subsubsection{Estimating Linear Models}
+        
+        \subsubsection{Estimating Linear Models with least squares}
         \cite{gamBook} describes the estimation process for unknown parameter vectors as finding the least squares solution to $\beta$. The computationally stablest and fastest method involves QR-decomposing the model matrix to express $\widehat{\beta}$ in terms of the upper triangular matrix. This method is widely used in statistical packages and is relevant for the numerically optimized version of the GAM. This approach involves starts with the linear model in the full matrix-vector form:
          
          \begin{equation}
@@ -283,7 +331,7 @@
             \left \| v \right \|^2 \equiv v^T v \equiv \sum_{n}^{i=1} v^2
         \end{equation}
         
-        An essential fact about the Euclidean length is that the rotation of a matrix does not change its length. This property can be used to estimate $\beta$ from a rotated orthogonal matrix. This also applies to the rotation of $y-X\beta$. Bootstrapping the Euclidean length to define our measure $S$ in the matrix-vector framework yields
+        An essential fact about the Euclidean length is that the rotation of a matrix's coordinated does not change its length. This property can be used to estimate $\beta$ from an orthogonal matrix. This also applies to the rotation of $y-X\beta$. Bootstrapping the Euclidean length to define our measure $S$ in the matrix-vector framework yields
         
         \begin{equation}
            \label{S} S =  \left \| y - \mu \right \|^2 = \| y - X\beta \|^2 
@@ -295,10 +343,10 @@
         X = Q\begin{bmatrix}R \\ 0 \end{bmatrix} = Q_f R
         \end{equation}
         
-        $R$ is the upper triangular matrix with p rows and p columns, the matrix $R$ has the rank of the original matrix. $Q$ is an orthogonal matrix with n rows and n columns of which the first p columns form $Q_f$.  By definition multiplying a vector with an orthogonal matrix does not change their length. The matrix algebra appendix provides more detail on these concepts. The QR-decomposition divides a matrix into two district matrices that have different properties but maintain their lengths. Multiplying an orthogonal matrix with $S$ does not change the length. Estimating  coefficients of a over determined system of equations can be stated in terms of a QR-decomosed matrix $X$. This amounts to applying the QR decomposition of the model matrix to \ref{S} and yields in:
+        $R$ is the upper triangular matrix with p rows and p columns, the matrix $R$ has the rank of the original matrix. $Q$ is an orthogonal matrix with n rows and n columns of which the first p columns form $Q_f$.  By definition multiplying a vector with an orthogonal matrix does not change their length. The matrix algebra appendix provides more detail on these concepts. The QR-decomposition divides a matrix into two district matrices that have different properties but maintain their lengths. Estimating  coefficients of a over determined system of equations can be stated in terms of a QR-decomosed matrix $X$. This amounts to applying the QR decomposition of the model matrix to \ref{S} and yields in:
         
         \begin{equation}
-             \left \| y - X\beta^2\right \|  =  \left \| Q^Ty - Q^T X\beta^2\right  \| =  \| Q^T-y \begin{bmatrix} R \\ 0 \end{bmatrix} \beta \|^2
+             \left \| y - X\beta\right \|^2  =  \left \| y - Q  \begin{bmatrix} R \\ 0 \end{bmatrix} \beta\right  \| ^2 =  \| Q^T y - \begin{bmatrix} R \\ 0 \end{bmatrix} \beta \|^2
         \end{equation}
         
         Only the orthogonal matrix of the QR-decomposed model matrix gets multiplied with the response variable vector and the original model matrix. Multiplying $Q^T$ with the response vector can be stated as $Q^T y = \begin{bmatrix} f \\ r \end{bmatrix}$. Where $f$ is vector of p dimensions and hence r is a vector of $n-p$ dimension.
@@ -316,7 +364,7 @@
         The reducible error, also called residual error is the difference between the model matrix multiplied by the estimated $\beta$ minus the value for y. $\|r\|^2 = \|y-X \widehat{\beta\x}\|^2$. This section showed that the $\beta$ vector can be expressed in terms of the decomposed model matrix, all practical applications for linear models rely on the QR decomposition.
         
     \subsubsection{Influence Matrix}
-    The hat or influence matrix is the projection matrix that maps the $y$ vector into the column space of $X$. Given a design matrix $X$ with n rows and p columns and $n > p$, the $y$ vector cannot lie in the column space of X. The hat matrix is the projection of $y$ into the column space of $X$. Since the projection is an approximation the matrix is called hat matrix. The hat matrix is required for the prediction piece of linear models and plays an important role for generalized additive models. \cite{gamBook} introduces the influence matrix as the matrix that yields the predicted fitted value vector $\widehat{\mu}$. To obtain $\widehat{\mu}$, the hat matrix is post multiplied with the data vector $y$. The influence matrix is required to compute the estimated value vector. The first p columns of Q make up the matrix $Q_f$. $f$ is then defined as $f = Q_f y$ which implies that 
+    The hat or influence matrix can compute the fitted $\widehat{y}$ values without forming $\beta$. The hat matrix maps the $y$ vector into the column space of $X$. Given a design matrix $X$ with n rows and p columns and $n > p$, the $y$ vector most likely does not lie in the column space of X. The hat matrix is the projection of $y$ into the column space of $X$. Since the projection is an approximation the matrix is called hat matrix. The hat matrix is required for the prediction piece of linear models and plays an important role for generalized additive models. \cite{gamBook} introduces the influence matrix as the matrix that yields the predicted fitted value vector $\widehat{\mu}$. To obtain $\widehat{\mu}$, the hat matrix is post multiplied with the data vector $y$. The influence matrix is required to compute the estimated value vector. The first p columns of Q make up the matrix $Q_f$. $f$ is then defined as $f = Q_f y$ which implies that 
     
     \begin{equation}
         \widehat{\beta} = R^{-1} Q_f^T y 
@@ -324,31 +372,31 @@
     
     Given that $\widehat{\mu} = X \widehat{\beta}$ and $X = Q_fR$, the fitted value vector can be written as 
     \begin{equation}
-        \widehat{\mu} = Q_f RR^-1 y = Q_fQ_f^T_f y  
+        \widehat{\mu} = Q_f RR^{-1} Q_f^T y = Q_fQ_f^T_f y  
     \end{equation}
+    
     Since the upper triangular matrix $R$ is multiplied by its inverse we can factor them out resulting with the hat matrix $A \equiv Q_f Q_f^T$ that fulfills $\widehat{\mu} = Ay$.  The hat matrix is essential in cross validating the estimated $\widehat{y}$ values. Generalized additive models iteratively minimize the difference in distance between the $\widehat{y}$ and $y$. The hat matrix provides a stable and efficient way to compute the $\widehat{y}$ values. 
     
     \subsubsection{Simple linear model example}
+    Linear models are a common choice for modeling a simple relationship between predictor and response variables. 
         
         
     \subsection{Generalized Linear Model}
-    The generalized linear model ("GLM") is an extension of the general linear model. It it is less restrictive on the response variable by allowing it to be distributed according to any of the exponential family distributions. The general linear model only allows normally distributed response variables. Exponential family distributions contain many practical distributions including Poisson, binomial and gamma. The binomial distribution is commonly used to model a binary outcome and the Poisson distribution is used to model occurrences.The GLM can be formally described as:
+    The generalized linear model ("GLM") is an extension of the general linear model. GLMs allow the response variable to be of any exponential family distribution and the error term to be  heteroscedastic . The previously introduced general linear model assumes a Normal distributed response variables with a constant variance. The GLM is less restrictive on the response variable by allowing it to be distributed according to any of the exponential family distributions and it allows the variance to be non-constant. Exponential family distributions contain many practical distributions including Poisson, binomial and gamma. The binomial distribution is commonly used to model a binary outcome and the Poisson distribution is used to model count data. The GLM models the link function $g()$ of the expected value $\mu_i$ as the linear combination of the model matrix $X$ and the estimated coefficients $\beta$ and can be formally described as:
 
-        \begin{equation} g(\mu_i) = X_i \beta_i \end{equation}
+    \begin{equation} g(\mu_i) = X_i \beta_i \end{equation}
 
-    The GLM models the link function $g()$ of the expected value $\mu_i$ as the linear combination of the model matrix $X$ and the estimated coefficients $\beta$. $X_i$ is the $i^th$ row of a model matrix X and $\beta$ is a vector of unknown parameters. The GLM models the expected value of the random variable $Y$ with $\mu_i \equiv E(Y_i)$. $Y_i$ is assumed to be distributed according to some exponential family. Every exponential family distribution has a canonical link function $g()$. The link function transfers the exponential functions into linear space and each exponential distribution comes with a canonical link function. The canonical link function transforms the expected value into the space of the estimated coefficients. The coefficients are estimated by transforming the right side of the equation. The data is then fit in this transformed scale but the expected variance is calculated on the original scale of the predictor variables. While the least squares approach was sufficient for estimating the coefficients for a normal distributed response with zero mean error, it fails to estimate an arbitrary amount of distribution parameters required for the GLM. \cite{glm} introduces iterative re-weighted least squares ("IRLS") as a method to obtain maximum likelihood estimates ("MLE") for a particular exponential family distribution. IRLS can be interpreted as the generalization of the least squares approach from normal distribution to any exponential family distribution. A practical feature of GLMs is that they can all be fitted using IRLS, independent of response variable distribution. 
- 
+  $X_i$ is the $i^th$ row of a model matrix X and $\beta$ is a vector of unknown parameters. The GLM models the expected value of the random variable $Y$ with $\mu_i \equiv E(Y_i)$. $Y_i$ is now assumed to be distributed according to some exponential family. Every exponential family distribution has a canonical link function $g()$. The canonical link function is the preferred choice for parameter interpretation. The link function transforms the expected value into the space of the estimated coefficients. The coefficients are estimated by transforming the right side of the equation. The data is then fit in this transformed scale but the expected variance is calculated on the original scale of the predictor variables. While the least squares approach was sufficient for estimating linear model with a Normal distributed response and a zero mean error term, it fails to estimate other exponential distributions required. The framework of least squares estimation thus needs to be extended to account for any exponential family distribution and a non-constant variance. Iterative reweighted least squares ("IRLS") provides a method for maximum-likelihood estimation for any exponential family distribution and heteroscedasticity \cite{glm}. The following sections explain the link function, how to generalize the MLE method from Normal to any exponential distribution and how to account for non-constant variance by weighting each observations. A practical feature IRLS is that it provides a single framework for all GLMs and after some modification can estimate GAMs. 
     
-        
-\subsubsection{Fitting Generalized Linear Models}
     
-    GLMs models are fit via distribution parameter estimation with MLE. The GLM assume a specific structure for the mean and variance of the distribution. This section  demonstrates a general approach to estimating the mean and variance of any exponential distribution with IRLS. IRLS iteratively computes the expected values for a given set of distribution parameters and checks if they have improved. Improved in this context means that the new choice of distribution parameters produces better expected values that are closer to the original $y$ values than the previous estimate. To account for a varying error term each observation is weighted according to its local average. This method gives more weight to observations that are extraordinary compared to its local mean. IRLS applies the weights to each observation to account for the varying error. The GLM models an n-vector of independent response variables $Y$, where $\mu$ is the expected value of $Y$:
+    \subsubsection{Likelihood for any exponential family distribution}
+    Generalized linear model estimation is based on MLE. Unlike the MLE for linear model the estimation process for GLM must account for two aspects: (1) $Y$ can be of any exponential family distribution (2) Heteroscedasticic error terms. Formally, the GLM models an n-vector of independent response variables $Y$, where $g()$ is the link function and $\mu$ is the expected value of $Y$:
     
     \begin{equation}
         g(\mu_i) = X_i \beta
     \end{equation}
     
-    With $\mu \equiv E(Y)$ and the link transformation of $Y_i$ as $Y_i \approx f_\theta_i (y_i)$ where $f_\theta_i$ stands for the canonical link transformation of an exponential family distribution. The value of $mu_i$ is determined by finding $\beta$. IRLS provides an estimation process for every exponential family distribution. The estimation of distribution parameters are hence derived from a equation that is general to any exponential family. The GLM assumes that every exponential family distribution can be expressed in terms of its mean and variance. The following equation shows how to generate the mean and the variance of any exponential distribution via the probability mass function (PMF).
+    With $\mu \equiv E(Y)$ and the link transformation of $Y_i$ as $Y_i \approx f_\theta_i (y_i)$ where $f_\theta_i$ stands for the canonical link transformation of an exponential family distribution. The link function $g()$ connects to expected value of $y$ to the linear predictor of predictor variables. The influence of $\beta$ is linear but the PDf describing the can be non-linear, the link function connects the two by transforming the response variable in the space of the estimated coefficients. The canonical link $g_c$ function is a special case of the link function where $g_c = X_i \beta$. For example, the canonical link function for the Poisson distribution is the log function. The canonical link function ensures that $\mu$ stays within the range of the response variable. To estimate any exponential family distribution the likelihood criterion must be stated in a general form. The PDF of any exponential family distribution can be states as \cite{woods}:
     
     \begin{equation}
         f_\theta = exp[\{y\theta-b(\theta)\}/a(\phi)+c(y, \phi)]
@@ -478,6 +526,7 @@
         
         
     \subsubsection{Generalized Linear Model Example}
+    
     
     \section{Generalized Additive Models}  \label{gam}
     The generalized additive model ("GAM") allows for non-parametric estimation of some variables of a GLM. This addition provides flexible estimation beyond the linear parametric form of the linear models. GAM has the interpretability advantages of GLMs where the contribution of each predictor variable is encoded. However, it has substantially more flexibility because the relationship between predictor and response variable are not assumed to be linear. The GAM assumes the relationship between predictor and response variable to be the sum of arbitrary functions. These functions are regularized by penalizing the second derivative. Because the acceleration of the functions are penalized, they are commonly referred to as smoothing functions. Hastie introduced GAMs and described many approaches to estimating the smooth functions \cite{gam}. Modern approaches have highlighted the use of regression splines for smooth functions estimation \cite{gamBook}. Woods states that the smooth function can best be represented as regression splines. This thesis focuses on representing the unknown smooth function via regression splines. The benefits of regression splines will be illustrated by progressively building a function in R that estimates a GAM. To see the similarities to the GLM, \cite{gamBook} formally describe the GAM as:
@@ -885,12 +934,12 @@
         }
     @
     
-    The function fit.gamG takes a model matrix X and a list of penalty matrices S. Both can be generated by the am.setup function. The generalized additive model seeks the best smoothing parameter by iteratively searching for a value until convergence. Each iteration step forms a vector of pseudo data. Pseudo data is the estimated values of the current parameter estimation after transformation by the canonical link function. If the resulting gcv score of the current pseudo data does not change, the model is converged. This function highlights the two step approach to fitting GAMs. Use a given choice of lambda parameters to generate the penalty matrix. Merge the model and penalty matrix and estimate the coefficients.The fitting process of finding $\beta$ given a choice of $\lambda$ is called penalized iterative re-weighted least squares and formally described in the next section.
+    The function fit.gamG takes a model matrix X and a list of penalty matrices S. Both can be generated by the am.setup function. The generalized additive model seeks the best smoothing parameter by iteratively searching for a value until convergence. Each iteration step forms a vector of pseudo data. Pseudo data is the estimated values of the current parameter estimation after transformation by the canonical link function. If the resulting gcv score of the current pseudo data does not change, the model is converged. This function highlights the two step approach to fitting GAMs. Use a given choice of lambda parameters to generate the penalty matrix. Merge the model and penalty matrix and estimate the coefficients.The fitting process of finding $\beta$ given a choice of $\lambda$ is called penalized iterative reweighted least squares and formally described in the next section.
     
     
     
-    \subsubsection{Penalized Iterative Re-weighted Least Squares}
-    While the GLM is fitted by the iterative re-weighted least squares, GAMs are fitted by the penalized re-weighted least squares. The major difference is that the objective contains the penalty matrix. To fit a generalized additive model the following penalized iteratively re-weighted least squares ("P-IRLS") scheme is iterated to convergence.
+    \subsubsection{Penalized Iterative Reweighted Least Squares}
+    While the GLM is fitted by the iterative re-weighted least squares, GAMs are fitted by the penalized reweighted least squares. The major difference is that the objective contains the penalty matrix. To fit a generalized additive model the following penalized iteratively re-weighted least squares ("P-IRLS") scheme is iterated to convergence.
     
     \begin{enumerate}
     \item Given the current parameter estimated $\beta^{[k]}$ and the estimated mean response vector $\mu^{[k]}$ compute 
@@ -913,23 +962,26 @@
     
     \subsubsection{Generalized Additive Model Example}
     
+    \section{Apache Spark Overview}
+    Apache Spark is a general purpose cluster computing engine designed for handling iterative workloads on very large data sets \cite{SparkIntro}. Spark is commonly seen as a successor to the class of MapReduce frameworks that emerged in the last decade. The open source projects HDFS, Hadoop and Hive brought large scale data storage, processing and analytics to many academic and professional organisations. HDFS allows to store petabyte level data on distributed and heterogeneous infrastructure but expose it through a homogeneous API. Hadoop and Hive are APIs that allow to perform MapReduce jobs on very large data sets stored in HDFS. Spark goes further by offering a high level, general purpose API and distributed, in-memory processing. The main advantage of the general purpose API is the ability to abstract from the MapReduce pattern when solving a problem with Spark. Spark offers a flexible API in Scala, Pyhton, Java and R to perform many other operations other than MapReduce. Other than Hive or Hadoop the processing steps do not have to follow to strict Map and Reduce pattern. Every Spark application contains a driver program with the the main function and a connection to a set of processes. The main function function performs operations on an abstractions called resilient distributed dataset ('RDD'). The RDD is Spark's central data structure and can be thought off as a distributed collection that facilitates four properties: memory abstraction, partitioning, resilience, and lazy execution. A major advantage of Spark is the ability to write a memory optimized application while maintaining a high level of abstraction. Memory optimized code often involves writing Fortran or C level code which forces a very low level perspective on the programmer. Specifying memory allocation allows very well performing code but it forces the programmer to worry about minuscule technical details rather than the actual task. Spark however, allows to write memory optimized code while interacting with columns and rows. Thinking about data in terms of rows and columns is a familiar abstraction from other analytics software like Python and R. Spark combines this high level abstraction with low-level optimization that is hidden from the programmer.Spark was designed for cyclic workloads. Performing an iterative operation on the same dataset in Hive or HDFS involved loading the the data from disk several times and performing the task. This lead to a large portion of Hive an Hadoop applications to be spend on I/O, not the actually computation. Spark was designed to address this weakness and maintains the working set in memory for the entire computation of a RDD. Spark uses lazy evaluation to reduce the memory usage of a program. Spark facilitates lazy execution through a concept called lineage. A driver program translates the program into a logical plan of operations performed on an RDD. The execution plan can be thought off as a directed acyclic graph ('DAG') where each vertex is a RDD and each edge a transformation. The logical execution plan adds an edge and a vertex for each operation, thus the root of the graph is the initial RDD and the result one of the leafs. The path from the root to a vertex is called it's linage. During the execution of the driver program no computation on any RDD is performed until a result is needed by a different computation or by the programmer. Spark realizes this by dividing the operations into two classes: Transformations and actions. Transformations will add a vertex and an edge to the DAG with out executing the calculation. Map() and Filter() are common examples of transformations. Actions add a vertex and an edge but require a particular values to be returned and thus the execution off all upstream transformations. The concept of lineage also allows to quickly recover a failed RDD from its predecessors by simple applying the last transformation to it's father RDD. The ability to recover fast from failure adds reliability. Spark is written in Scala, a functional programming language for the JVM.
     
+    \subsection{Spark's Machine Learning Library}
+        Sparks high level API and in-memory processing can be used for a wide array of applications. For example, Spark offers libraries for streaming, SQL and graph computation. This thesis uses the machine learning library ('MLlib') to implement GAM estimation. MLlib's was designed to offer practical machine learning with while maintaining scalability and ease of use. It offers many common learning algorithms including classification, regression, clustering, collaborative filtering, dimensionality reduction, as well as lower-level optimization primitives and higher-level pipeline APIs. Fortunately it offers  MLlib defines applications in terms of pipelines, estimators and transformers. A pipeline is defines as a series of Estimator and Transformer. A pipeline starts with a RDD and then passes it through several Estimator and Transformer stages. Every Transformer implements a transform() method that alters a RDD. An Estimator is an abstraction for the used learning model. Each Estimator implements the method fit() which accepts a RDD and returns a Transformer. MLlib offers the Generalized Linear Model as a Transformer and Estimator step. This thesis will implement the GAM as a special case of MLlib implementation of GLM.
     
+    \subsection{GAMs as Spark GLMs}
+        GLM are already implemented in the Mllib. \cite{gamBook} describes a process to cast GAM as GLMs. 
     
-    \section{Apache Spark}
-    Apache Spark is general purpose cluster computing framework introduced by \cite{SparkIntro}. The decreasing cost of computing hardware has . Map-Reduce was the first main stream
-        \subsection{General In Memory Cluster Computing Framework}
-        \subsection{Resilient Distributed Datasets}
-        \subsection{The Language Scala and Breeze}
-        \subsection{Machine Learning Pipeline}
-        \subsubsection{Transformer}
-        \subsubsection{Estimator}
-        \subsection{Implementing GAM in Apache Spark}
-        \subsection{Optimized GAMs for large data sets}
-        \subsubsection{Cross Validation}
-        \subsubsection{Parallel Estimation}
-        \subsection{R vs Spark vs SparkR}
-        \subsubsection{Architecture}
+    \subsection{Casting GAMs as GLMs}
+    
+    \subsection{Optimized GAMs for large data sets}
+    
+    \subsubsection{Cross Validation}
+    
+    \subsubsection{Parallel Estimation}
+    
+    \subsection{R vs Spark vs SparkR}
+    
+    \subsubsection{Architecture}
         
         
 
